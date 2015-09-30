@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-35
+2015-9-30 David Schneider
+- add option to print Dgram headers in hex to xtclinedump
+
 Tag: V00-08-34
 2015-8-31 David Schneider
 - extend data mover script to handle no small data files.

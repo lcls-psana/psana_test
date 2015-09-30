@@ -12,6 +12,7 @@ Pds::Xtc * printDgramHeader(Pds::Dgram *dgram);
 // translates a few enums
 Pds::Xtc * printTranslatedDgramHeader(Pds::Dgram *dgram);
 
+void printDgramHeaderHex(Pds::Dgram *dgram);
 
 // writes xtc header info to stdout.  Returns xtc payload size.
 uint32_t printXtcHeader(Pds::Xtc *xtc);

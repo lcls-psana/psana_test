@@ -27,12 +27,13 @@ const char * usage = "%s dg|xtc1|xtc xtcfile [--payload=n] [--dgrams=n]\n \
       --payload=n    how many bytes of the payload to print for xtc\n\
       --dgrams=n     how many dgrams to print\n\
       --sml          parse out the small data proxies instead of printing the payload\n\
-      --epics        print extra lines with details on epics, both epicsConfigV1 and the pv's\n";
+      --epics        print extra lines with details on epics, both epicsConfigV1 and the pv's\n\
+      --dgHex        for dg headers, give a hex listing of 40 bytes as 10 uint32's";
 
-void dgramHeaderIterator_nextAndOffset(int fd, long maxDgrams);           // dg
-void dgramAndItsXtcIterator(int fd, long maxDgrams, bool xtcDiagnose);    // xtc1
+void dgramHeaderIterator_nextAndOffset(int fd, long maxDgrams, bool printDgHex);           // dg
+void dgramAndItsXtcIterator(int fd, long maxDgrams, bool xtcDiagnose, bool printDgHex);    // xtc1
 void dgramAndXtcChildrenIteratorPrintXtcOffsetAndBytes(int fd, long maxDgrams, size_t maxPayloadPrint,
-                                                       bool printEpicsConfig, bool parseSml, bool xtcDiagnose); // xtc
+                                                       bool printEpicsConfig, bool parseSml, bool xtcDiagnose, bool printDgHex); // xtc
 
 const int DEFAULT_MAX_PAYLOAD_PRINT = 1;
 
@@ -44,6 +45,8 @@ int main(int argc, char *argv[]) {
   bool printEpics = false;
   bool parseSml = false;
   bool xtcDiagnose = false;
+  bool printDgHex = false;
+
   if (argc > 1) dumpArg = argv[1];
   if (argc > 2)  xtcFileName = argv[2];
   if ((NULL == dumpArg) or (xtcFileName=="")) {
@@ -56,6 +59,7 @@ int main(int argc, char *argv[]) {
   static const char *epics = "--epics";
   static const char *sml = "--sml";
   static const char *diag = "--diag";
+  static const char *dgHex = "--dgHex";
 
   for (int ii = 3; ii < argc; ii++) {
     bool isPayload = (0 == strncmp(argv[ii], payload, strlen(payload)));
@@ -63,9 +67,10 @@ int main(int argc, char *argv[]) {
     bool isEpics = (0 == strncmp(argv[ii], epics, strlen(epics)));
     bool isSml = (0 == strncmp(argv[ii], sml, strlen(sml)));
     bool isDiag = (0 == strncmp(argv[ii], diag, strlen(diag)));
-    if (not isPayload and not isDgrams and not isEpics and not isSml and not isDiag) {
-      fprintf(stderr,"Error: argument %s starts out with neither %s , %s,  %s nor %s nor %s\n",
-              argv[ii], payload, dgrams, epics, sml, diag);
+    bool isDgHex = (0 == strncmp(argv[ii], dgHex, strlen(dgHex)));
+    if (not isPayload and not isDgrams and not isEpics and not isSml and not isDiag and not isDgHex) {
+      fprintf(stderr,"Error: argument %s starts out with neither %s , %s,  %s nor %s nor %s nor %s\n",
+              argv[ii], payload, dgrams, epics, sml, diag, dgHex);
       return -1;
     }
     if (isDiag) {
@@ -78,6 +83,10 @@ int main(int argc, char *argv[]) {
     }
     if (isSml) {
       parseSml = true;
+      continue;
+    }
+    if (isDgHex) {
+      printDgHex = true;
       continue;
     }
     char * intVal = argv[ii];
@@ -103,12 +112,12 @@ int main(int argc, char *argv[]) {
   }
 
   if (strcmp(dumpArg,"dg")==0) {
-    dgramHeaderIterator_nextAndOffset(fd, maxDgrams);
+    dgramHeaderIterator_nextAndOffset(fd, maxDgrams, printDgHex);
   } else if (strcmp(dumpArg,"xtc1")==0) {
-    dgramAndItsXtcIterator(fd, maxDgrams, xtcDiagnose);
+    dgramAndItsXtcIterator(fd, maxDgrams, xtcDiagnose, printDgHex);
   } else if (strcmp(dumpArg,"xtc")==0) {
     dgramAndXtcChildrenIteratorPrintXtcOffsetAndBytes(fd, maxDgrams, maxPayloadPrint, 
-                                                      printEpics, parseSml, xtcDiagnose);
+                                                      printEpics, parseSml, xtcDiagnose, printDgHex);
   } else {
     fprintf(stderr, "ERROR: unexpected, dumpArg=%s not recognized, must be one of 'dg', 'xtc1', 'xtc', 'xtcp'\n",
             dumpArg);
@@ -120,7 +129,7 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-void dgramHeaderIterator_nextAndOffset(int fd, long maxDgrams) {
+void dgramHeaderIterator_nextAndOffset(int fd, long maxDgrams, bool printDgHex) {
   psana_test::DgramHeaderIterator dgIter(fd);
   std::pair<Pds::Dgram *,size_t> dgramOffset = dgIter.nextAndOffsetFromStart();
   int dgNumber = 0;
@@ -130,13 +139,14 @@ void dgramHeaderIterator_nextAndOffset(int fd, long maxDgrams) {
     size_t offset = dgramOffset.second;
     fprintf(stdout,"dg=%5d offset=0x%8.8lX ",dgNumber,offset);
     psana_test::printTranslatedDgramHeader(dgram);
+    if (printDgHex) psana_test::printDgramHeaderHex(dgram);
     fprintf(stdout,"\n");
     if ((maxDgrams > 0) and (dgNumber >= maxDgrams)) return;
     dgramOffset = dgIter.nextAndOffsetFromStart();
   }
 }
 
-void dgramAndItsXtcIterator(int fd, long maxDgrams, bool xtcDiagnose) {
+void dgramAndItsXtcIterator(int fd, long maxDgrams, bool xtcDiagnose, bool printDgHex) {
   psana_test::DgramWithXtcPayloadIterator dgIter(fd, 
                                                  psana_test::DgramWithXtcPayloadIterator::DEFAULT_MAX_DGRAM_SIZE,
                                                  xtcDiagnose);
@@ -148,6 +158,7 @@ void dgramAndItsXtcIterator(int fd, long maxDgrams, bool xtcDiagnose) {
     size_t offset = dgramOffset.second;
     fprintf(stdout,"dg=%5d offset=0x%8.8lX ",dgNumber,offset);
     psana_test::printTranslatedDgramHeader(dgram);
+    if (printDgHex) psana_test::printDgramHeaderHex(dgram);
     fprintf(stdout,"\n  xtc: ");
     psana_test::printXtcHeader(& dgram->xtc);
     fprintf(stdout,"\n");
@@ -167,7 +178,7 @@ bool validPayload(const Pds::Damage &damage, enum Pds::TypeId::Type id) {
 }
 
 void dgramAndXtcChildrenIteratorPrintXtcOffsetAndBytes(int fd, long maxDgrams, size_t maxPayloadPrint, 
-                                                       bool printEpics, bool parseSml, bool xtcDiagnose) {
+                                                       bool printEpics, bool parseSml, bool xtcDiagnose, bool printDgHex) {
   psana_test::DgramWithXtcPayloadIterator dgIter(fd,
                                                  psana_test::DgramWithXtcPayloadIterator::DEFAULT_MAX_DGRAM_SIZE,
                                                  xtcDiagnose);
@@ -179,6 +190,7 @@ void dgramAndXtcChildrenIteratorPrintXtcOffsetAndBytes(int fd, long maxDgrams, s
     size_t dgOffset = dgramOffset.second;
     fprintf(stdout,"dg=%5d offset=0x%8.8lX ",dgNumber,dgOffset);
     psana_test::printTranslatedDgramHeader(dgram);
+    if (printDgHex) psana_test::printDgramHeaderHex(dgram);
     size_t rootXtcOffset = dgOffset + size_t(((uint8_t *)(&dgram->xtc))-((uint8_t*)dgram));
     fprintf(stdout,"\nxtc d=0  offset=0x%8.8lX ",rootXtcOffset);
     psana_test::printXtcHeader(& dgram->xtc);

@@ -117,6 +117,16 @@ uint32_t printXtcWithOffsetAndDepth(Pds::Xtc *xtc,int offset, int depth) {
   return xtc->extent;
 }
 
+void printDgramHeaderHex(Pds::Dgram *dgram) {
+  fprintf(stdout, "  dgHeaderHex={");
+  int32_t *p = static_cast<int32_t*>(static_cast<void *>(dgram));
+  for (int i =0; i < 10; ++i) {
+    fprintf(stdout, " 0x%8.8X", *p++);
+    if (i <9) fprintf(stdout, ",");
+  }
+  fprintf(stdout, "}");
+}
+
 Pds::Xtc * printTranslatedDgramHeader(Pds::Dgram *dgram) {
   Pds::Sequence & seq = dgram->seq;
   Pds::Env & env = dgram->env;
