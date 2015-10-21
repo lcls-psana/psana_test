@@ -357,6 +357,7 @@ class XtcLine(object):
     def __init__(self,ln):
         def inthex(x):
             return int(x,16)
+        ln = ln.split('dgHeaderHex=')[0]
         self.ln=ln
         if ln.startswith('dg='):
             self.contains='dg'
@@ -1375,23 +1376,31 @@ def copyToMultiTestDir(experiment, run, numberCalibCycles, numberEventsPerCalibC
             print "--output--\n%s\n--error--%s\n-------" % (o,e)
        
         
-def copyBytes(src, n, dest, mode='truncate'):
-    '''copies the fist n bytes, or a set of invervals, the intervals are 
+def copyBytes(src, n, dest, mode='truncate', verbose=True):
+    '''copies the fist n bytes, or a set of intervals, the intervals are 
     treated as [a,b), i.e, copyBytes(fileA,[[10,13]],fileB) copies bytes
     10,11 and 12 from fileA to make fileB.
 
+    recognizes the string 'end' in a interval to mean copy to the end of the file.
     set mode to 'append' to append
     '''
     if isinstance(n,int):
         intervals = [[0,n]]
-        print "copying %d bytes from src=%s to dest=%s" % (n,src,dest)
+        if verbose:
+            print "copying %d bytes from src=%s to dest=%s" % (n,src,dest)
     elif isinstance(n,list):
         intervals = n
-        print "copying %d sets of bytes:" % len(intervals),
+        if verbose:
+            print "copying %d sets of bytes:" % len(intervals),
         for interval in intervals:
             a,b = interval
-            print " [%d,%d)" % (a,b),
-        print " from src=%s to dest=%s" % (src, dest)
+            if b == 'end':
+                b = os.stat(src).st_size
+                interval[1] = b
+            if verbose:
+                print " [%d,%d)" % (a,b),
+        if verbose:
+            print " from src=%s to dest=%s" % (src, dest)
     inFile = io.open(src,'rb')
     if mode == 'truncate':
         outFile = io.open(dest,'wb')
@@ -1472,7 +1481,9 @@ def parseXtcFileName(xtc):
     if len(flds) != 4:
         raise BadXtcFilename("xtc=%s and flds=%r" % (xtc, flds))
     exp,run,stream,chunk = flds
-    return int(run[1:]), int(stream[1:]), int(chunk[1:].split('.xtc')[0])
+    chunk = chunk.split('.smd')[0]
+    chunk = chunk.split('.xtc')[0]
+    return int(run[1:]), int(stream[1:]), int(chunk[1:])
 
 def getXtcDirsToScan(currentXtcDirList, previousXtcDirs):
     print "going through %d xtc directories, checking xtc file modification times" % len(currentXtcDirList)

@@ -11,6 +11,14 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-36
+2015-10-21 David Schneider
+- add live mode small data testing utility. Utility takes a mapfile
+  giving datagram offsets.
+- update psanaTestLib to handle the hex output of dgheaders from xtclinedump
+- update psanaTestLib.copyBytes to understand 'end' to copy to end of file
+- create a unitTests file for liveAvail tests
+	
 Tag: V00-08-35
 2015-9-30 David Schneider
 - add option to print Dgram headers in hex to xtclinedump

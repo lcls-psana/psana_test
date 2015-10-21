@@ -1,0 +1,66 @@
+#!@PYTHON@
+
+import os
+import argparse
+from psana_test.SmlDataMover import smallDataMover
+
+programDescription = '''
+testing utility to simulate a data mover handling small data files.
+'''
+
+programDescriptionEpilog = '''
+The mapfile gives the offsets in each stream/chunk for a given event.
+It will look like:
+evt=         0 0.0=     83544 1.0=     83544 2.0=     83544 3.0=     83544 4.0=     83544 5.0=     83544 80.0=      5922
+evt=         1 0.0=     83544 1.0=     83544 2.0=     83544 3.0=     83544 4.0=     83544 5.0=     83544 80.0=      6042
+evt=         2 0.0=     83544 1.0=     83544 2.0=     83544 3.0=     83544 4.0=     83544 5.0=     83544 80.0=      7334
+...
+Line one says that for event 0, stream 0 chunk 0 starst at offset 83533 into the chunk 0 file, on up to stream 80 
+chunk 0 starts at offset 5922. 
+
+On a chunk boundary, you might see
+
+evt=    229487 0.0= 612735692 1.0= 612630040 2.0= 612602716 3.0= 612726704 4.0= 612618212 5.0= 612606976 80.1=  69119536
+evt=    229488 0.0= 612735692 1.0= 612630040 2.0= 612602716 3.0= 612726704 4.0= 612618212 5.1=       220 80.1=  69120828
+evt=    229489 0.0= 612735692 1.0= 612630040 2.0= 612602716 3.0= 612726704 4.1=       220 5.1=       220 80.1=  69120828
+evt=    229490 0.0= 612735692 1.0= 612630040 2.1=       220 3.0= 612726704 4.1=       220 5.1=       220 80.1=  69122120
+evt=    229491 0.1=       220 1.0= 612630040 2.1=       220 3.0= 612726704 4.1=       220 5.1=       220 80.1=  69122120
+evt=    229492 0.1=       220 1.0= 612630040 2.1=       220 3.1=       220 4.1=       220 5.1=       220 80.1=  69123412
+evt=    229493 0.1=       220 1.1=       220 2.1=       220 3.1=       220 4.1=       220 5.1=       220 80.1=  69123412
+
+The mapfile does not give the lengths of xtc chunk files. So when you swap chunks, a mover will need to copy the
+remaining byges of the last chunk.
+
+I'm currently creating it with a Python script that reads the output
+of psana_examples.DumpDgram and a event counter.
+'''
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=programDescription, 
+                                     epilog=programDescriptionEpilog,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+
+    defInputDir = '/reg/d/ana01/temp/davidsch/sxrh4315/xtc/smalldata'
+    defOutputDir = '/reg/d/ana01/temp/davidsch/sxrh4315_live/smalldata'
+    defRunNumber = 128
+    defMapFile = '/reg/d/ana01/temp/davidsch/sxrh4315/sxrh4315-r0128.mapfile'
+
+    ########################
+    # server paramemeters
+    parser.add_argument('-m', '--mapfile', type=str, help="map file. Default=%s" % defMapFile, default=defMapFile)
+    parser.add_argument('-n', '--numevents', type=int, help="number of events to move. Default is all", default=0)
+    parser.add_argument('-i', '--inputdir', type=str, help="input directory for small data files. def=%s"%defInputDir, default=defInputDir)
+    parser.add_argument('-r', '--run', type=int, help="run number. def=%d"%defRunNumber, default=defRunNumber)
+    parser.add_argument('-o', '--outputdir', type=str, help="output directory for small data files. def=%s"%defOutputDir, default=defOutputDir)
+    parser.add_argument('-s', '--hertz', type=int, help="rate in hertz/events per second to copy, default is 120", default=120)
+    parser.add_argument('-v', '--verbose', action='store_true', help="vebose output'", default=False)
+    #######################
+    
+    args = parser.parse_args()
+
+    assert os.path.exists(args.inputdir), "The inputdir %r doesn't exist" % args.inputdir
+    assert os.path.exists(args.outputdir), "The outputdir %r doesn't exist" % args.outputdir
+    assert (os.path.exists(args.mapfile)), "The mapfile %r doesn't exist" % args.mapfile
+    smallDataMover(args.inputdir, args.outputdir, args.run, args.numevents, args.hertz, args.mapfile, args.verbose)
+    
+

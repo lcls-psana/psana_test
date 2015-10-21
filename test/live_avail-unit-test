@@ -1,0 +1,13 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# Description:
+#   Test script for psana_test/LiveAvail
+#   
+#------------------------------------------------------------------------
+
+from psana_test.unitTestsLiveAvail import *
+
+if __name__ == "__main__":
+    # now run the tests in unitTests, this routine does not return.
+    unittest.main(argv=[sys.argv[0], '-v'])
+

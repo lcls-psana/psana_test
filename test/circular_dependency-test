@@ -1,0 +1,19 @@
+#!@PYTHON@
+
+import sys
+import unittest
+
+class CircDepend( unittest.TestCase ) :
+  def setUp(self):
+    pass
+
+  def tearDown(self):
+    pass
+
+  def test_circDependXtc(self):
+    from XtcInput.PyDgramListUtil import xtcFileNameStreamChunk, getDgramInfo
+    print "success, imported utilities directly from XtcInput"
+
+if __name__ == "__main__":
+    # now run the tests in unitTests, this routine does not return.
+    unittest.main(argv=[sys.argv[0], '-v'])
