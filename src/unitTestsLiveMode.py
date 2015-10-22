@@ -18,21 +18,14 @@ import time
 import shutil
 import psana_test.psanaTestLib as ptl
 
-from AppUtils.AppDataPath import AppDataPath
-
 DATADIR = ptl.getTestDataDir()
 OUTDIR = ptl.getDataArchDir(pkg='psana_test', datasubdir='test_output')
 
 
-def getH5OutfileName(path):
-    basename = os.path.basename(path)
-    h5basename = os.path.splitext(basename)[0] + '.h5'
-    return os.path.join(OUTDIR,h5basename)
-
 #-------------------------------
 #  Unit test class definition --
 #-------------------------------
-class LiveAvail( unittest.TestCase ) :
+class LiveMode( unittest.TestCase ) :
 
     def setUp(self) :
     	""" 
@@ -59,7 +52,7 @@ class LiveAvail( unittest.TestCase ) :
                                          archsubdir='liveModeSim')
 
         # make a random directory for the testing that we will remove when done
-        destDir = os.path.join(destDirBase, 'outdir')  #tempfile.mkdtemp(dir=destDirBase)
+        destDir = tempfile.mkdtemp(dir=destDirBase)
         if not os.path.exists(destDir):
             os.mkdir(destDir)
         destSmallDataDir = os.path.join(destDir, 'smalldata')
@@ -77,11 +70,13 @@ class LiveAvail( unittest.TestCase ) :
         self.destDataset = 'exp=%s:run=%d:smd:live:dir=%s' % \
                       (expname, run, destDir)
 
-        self.moverCmd = 'psanaTestSmlDataMover -m %s -i %s -o %s -r %d  --hertz 120' % \
-                        (mapfile, srcSmallDataDir, destSmallDataDir, run)
+        self.moverCmdWithoutRate = 'psanaTestSmlDataMover -m %s -i %s -o %s -r %d' % \
+                                   (mapfile, srcSmallDataDir, destSmallDataDir, run)
         
         for fname in glob.glob(os.path.join(destSmallDataDir, '*')):
             os.unlink(fname)
+
+        self.destDir = destDir
 
     def tearDown(self) :
         """
@@ -93,16 +88,14 @@ class LiveAvail( unittest.TestCase ) :
         This method will only be called if the setUp() succeeds, regardless 
         of the outcome of the test method. 
         """
-        pass
+        shutil.rmtree(self.destDir)
 
     def testLiveAvail(self):
-        '''Test that liveAvail works
+        '''Test that liveAvail works. Sleep enough with each event to skip some to keep up.
         '''
+        print self.moverCmdWithoutRate
+        os.system("%s --hertz 120&" % self.moverCmdWithoutRate)
 
-        print self.moverCmd
-        os.system("%s&" % self.moverCmd)
-
-        ########### LiveAvail Usage Below #############
         liveAvail = psana.LiveAvail()
         ds = psana.DataSource(self.destDataset, module=liveAvail)
         skipped = 0
@@ -120,6 +113,37 @@ class LiveAvail( unittest.TestCase ) :
         self.assertEqual(processed+skipped, 2338, msg='expected 2338 events in test data, but got %d' % (processed+skipped))
         self.assertGreater(skipped, 0, msg="with delay of 9ms, should have skipped some events?")
 
+    def testLiveDeadSameOrder(self):
+        '''check that the live and dead give the same order for events.
+        '''
+        t0 = time.time()
+        ds = psana.DataSource(self.srcDataset)
+        deadEventTimes = []
+        for evt in ds.events():
+            evtId = evt.get(psana.EventId)
+            if evtId is not None:
+                deadEventTimes.append(str(evtId))
+        print "finished dead dset=%s in %.2f sec #events=%d" % (self.srcDataset, 
+                                                                 time.time()-t0, 
+                                                                 len(deadEventTimes))
+
+        os.system("%s --hertz 500&" % self.moverCmdWithoutRate)
+        t0 = time.time()
+        ds = psana.DataSource(self.destDataset)
+        liveEventTimes = []
+        for evt in ds.events():
+            evtId = evt.get(psana.EventId)
+            if evtId is not None:
+                liveEventTimes.append(str(evtId))
+        print "finished live: dset=%s in %.2f sec #events=%d" % (self.destDataset, 
+                                                                 time.time()-t0, 
+                                                                 len(liveEventTimes))
+
+        
+        self.assertEqual(len(liveEventTimes), len(deadEventTimes), 
+                         msg="live and dead event time lengths differ")
+        for liveTm, deadTm in zip(liveEventTimes, deadEventTimes):
+            self.assertEqual(liveTm, deadTm)
 
 if __name__ == "__main__":
     unittest.main(argv=[sys.argv[0], '-v'])

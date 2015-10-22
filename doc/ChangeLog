@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-37
+2015-10-22 David Schneider
+- rename LiveAvail tests to LiveMode tests. 
+- add test to make sure live/dead mode produce same order
+	
 Tag: V00-08-36
 2015-10-21 David Schneider
 - add live mode small data testing utility. Utility takes a mapfile

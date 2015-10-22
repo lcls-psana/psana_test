@@ -1,11 +1,11 @@
 #!@PYTHON@
 #--------------------------------------------------------------------------
 # Description:
-#   Test script for psana_test/LiveAvail
+#   Test script for psana_test liveMode tests
 #   
 #------------------------------------------------------------------------
 
-from psana_test.unitTestsLiveAvail import *
+from psana_test.unitTestsLiveMode import *
 
 if __name__ == "__main__":
     # now run the tests in unitTests, this routine does not return.
