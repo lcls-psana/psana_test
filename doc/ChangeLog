@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-38
+2015-12-10 David Schneider
+- update to pdsdata 8.4.5 with modified Epix::Config100aV2, and Epix::ElementV3 JIRA PSAS-198
+
 Tag: V00-08-37
 2015-10-22 David Schneider
 - rename LiveAvail tests to LiveMode tests. 

@@ -2614,10 +2614,19 @@ def Epix_Config100aV2_to_str(obj, indent, lvl, methodSep):
     methodStr += 'version: %s' % uint32_to_str( obj.version() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'runTrigDelay: %s' % uint32_to_str( obj.runTrigDelay() )
+    methodStr += 'usePgpEvr: %s' % uint32_to_str( obj.usePgpEvr() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'daqTrigDelay: %s' % uint32_to_str( obj.daqTrigDelay() )
+    methodStr += 'evrRunCode: %s' % uint32_to_str( obj.evrRunCode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'evrDaqCode: %s' % uint32_to_str( obj.evrDaqCode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'evrRunTrigDelay: %s' % uint32_to_str( obj.evrRunTrigDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'epixRunTrigDelay: %s' % uint32_to_str( obj.epixRunTrigDelay() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'dacSetting: %s' % uint32_to_str( obj.dacSetting() )
@@ -2651,6 +2660,18 @@ def Epix_Config100aV2_to_str(obj, indent, lvl, methodSep):
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'adcPipelineDelay: %s' % uint32_to_str( obj.adcPipelineDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'adcPipelineDelay0: %s' % uint32_to_str( obj.adcPipelineDelay0() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'adcPipelineDelay1: %s' % uint32_to_str( obj.adcPipelineDelay1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'adcPipelineDelay2: %s' % uint32_to_str( obj.adcPipelineDelay2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'adcPipelineDelay3: %s' % uint32_to_str( obj.adcPipelineDelay3() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'prepulseR0Width: %s' % uint32_to_str( obj.prepulseR0Width() )
@@ -2878,6 +2899,47 @@ def Epix_ElementV1_to_str(obj, indent, lvl, methodSep):
 def Epix_ElementV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Epix.ElementV2.TypeId
     assert obj.Version == psana.Epix.ElementV2.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameNumber: %s' % uint32_to_str( obj.frameNumber() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ticks: %s' % uint32_to_str( obj.ticks() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fiducials: %s' % uint32_to_str( obj.fiducials() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frame: %s' % ndarray_to_str( obj.frame() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'calibrationRows: %s' % ndarray_to_str( obj.calibrationRows() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'environmentalRows: %s' % ndarray_to_str( obj.environmentalRows() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'temperatures: %s' % ndarray_to_str( obj.temperatures() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'lastWord: %s' % uint32_to_str( obj.lastWord() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'vc: %s' % uint8_to_str( obj.vc() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'lane: %s' % uint8_to_str( obj.lane() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'acqCount: %s' % uint16_to_str( obj.acqCount() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def Epix_ElementV3_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Epix.ElementV3.TypeId
+    assert obj.Version == psana.Epix.ElementV3.Version
     methodStrings = []
     # one_line_methods
     methodStr = doIndent(indent, lvl)
@@ -8294,6 +8356,7 @@ objFunctionTable = {
     (psana.Epix.ConfigV1.TypeId,1) : Epix_ConfigV1_to_str,
     (psana.Epix.ElementV1.TypeId,1) : Epix_ElementV1_to_str,
     (psana.Epix.ElementV2.TypeId,2) : Epix_ElementV2_to_str,
+    (psana.Epix.ElementV3.TypeId,3) : Epix_ElementV3_to_str,
     (psana.EpixSampler.ConfigV1.TypeId,1) : EpixSampler_ConfigV1_to_str,
     (psana.EpixSampler.ElementV1.TypeId,1) : EpixSampler_ElementV1_to_str,
     (psana.EvrData.ConfigV1.TypeId,1) : EvrData_ConfigV1_to_str,
