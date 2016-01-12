@@ -799,6 +799,19 @@ class Psana( unittest.TestCase ) :
         # now that we've finished and tests have passed, remove the temp directory under data/psana_test/liveModeSim
         shutil.rmtree(destDir)
 
+    def testDdlGeneratedBoundsChecking(self):
+        '''indexing a acq channel that doesn't exist should
+        produce an IndexError exception, it used to produce a segfault.
+        '''
+        inFile = os.path.join(ptl.getTestDataDir(),
+                              'test_000_amo_amo01509_e8-r0125-s00-c00.xtc')
+        src = psana.Source('DetInfo(AmoMBES.0:Acqiris.0)')
+        for evt in psana.DataSource(inFile).events():
+            acq = evt.get(psana.Acqiris.DataDescV1, src)
+            if acq is None: continue
+            self.assertRaises(IndexError, acq.data,4)
+                
+
     @unittest.skip("complicated test - skip for now. JIRA PSAS-182")
     def testLiveModeConsistantEventOrder(self):
         '''make sure that live mode always reads through events in the same order.
@@ -924,6 +937,7 @@ class Psana( unittest.TestCase ) :
         shutil.rmtree(inProgressDir)
 
 
+        
 if __name__ == "__main__":
     unittest.main(argv=[sys.argv[0], '-v'])
 
