@@ -34,8 +34,8 @@ class Pdsdata( unittest.TestCase ) :
         assert os.path.exists(DATADIR), "Data dir: %s does not exist, cannot run unit tests" % DATADIR
         assert os.path.exists(OUTDIR), "Output directory: %s does not exist, can't run unit tests" % OUTDIR
         self.outputDir = tempfile.mkdtemp(dir=OUTDIR)
-        self.cleanUp = False#True    # delete intermediate files if True
-        self.verbose = True #False    # print psana output, ect
+        self.cleanUp = True    # delete intermediate files if True
+        self.verbose = False   # print psana output, ect
 
     def tearDown(self) :
         """
@@ -56,32 +56,60 @@ class Pdsdata( unittest.TestCase ) :
             f.write(txt)
             f.close()
 
+        def fmtErr(cmd, stdout, stderr):
+            msg = "== error ==\n"
+            msg += "cmd: %s\n" % cmd
+            if stdout:
+                msg += "== stdout ==\n"
+                msg += stdout
+                msg += '\n'
+            if stderr:
+                msg += "== stderr ==\n"
+                msg += stderr
+                msg += '\n'
+            return msg
         xtcs = glob.glob(os.path.join(DATADIR, "test_*_*.xtc"))
         smdbases = [os.path.basename(xtc)[0:-3] + "smd.xtc" for xtc in xtcs]
-        os.mkdir(os.path.join(self.outputDir, "smalldata"))
+        try:
+            os.mkdir(os.path.join(self.outputDir, "smalldata"))
+        except OSError:
+            pass
         lastTestTime = 0.0
-        tests2do =  [0,2,13]
+        testsWithSameEventKeys = [0,2,13, 90]
+        testsWithDifferentEventKeys = [62,65,91]  # 90 and 91 are meck test files, 
+        tests2do = testsWithSameEventKeys + testsWithDifferentEventKeys
+        # 91 is 90 but with damage added to a later dgram
         for xtc, smdbase in zip(xtcs, smdbases):
             testNo = int(os.path.basename(xtc).split("_")[1])
             if testNo not in tests2do: continue
             # make soft link to process small data proxys
-            os.symlink(xtc, os.path.join(self.outputDir, os.path.basename(xtc)))
+            try:
+                os.symlink(xtc, os.path.join(self.outputDir, os.path.basename(xtc)))
+            except OSError:
+                pass
             smdpath = os.path.join(self.outputDir, "smalldata", smdbase)
             sys.stdout.write("==== last time=%.2f sec, testing %s ====\n" % (lastTestTime, smdpath))
             sys.stdout.flush()
             t0 = time.time()
-            evKeysOrigOut, evKeysOrigErr = ptl.cmdTimeOut("psana -m EventKeys %s" % xtc)
-            smlDataOut,    smlDataErr    = ptl.cmdTimeOut("smldata -f %s -o %s" % (xtc, smdpath))
-            evKeysSmdOut, evKeysSmdErr   = ptl.cmdTimeOut("psana -m EventKeys %s | grep -v SmlData::ConfigV1" % smdpath)
+            evKeysOrigCmd = "psana -m PrintEventId,EventKeys %s" % xtc
+            smlDataCmd = "smldata -f %s -o %s" % (xtc, smdpath)
+            evKeysSmdCmd = "psana -m PrintEventId,EventKeys %s | grep -v SmlData::ConfigV1" % smdpath
+            evKeysOrigOut, evKeysOrigErr = ptl.cmdTimeOut(evKeysOrigCmd)
+            smlDataOut,    smlDataErr    = ptl.cmdTimeOut(smlDataCmd)
+            evKeysSmdOut,  evKeysSmdErr  = ptl.cmdTimeOut(evKeysSmdCmd)
             evKeysOrigErr = '\n'.join([ln for ln in evKeysOrigErr.split('\n') if not ptl.filterPsanaStderr(ln)])
             evKeysSmdErr  = '\n'.join([ln for ln in evKeysSmdErr.split('\n')  if not ptl.filterPsanaStderr(ln)])
-            self.assertEqual(evKeysOrigErr.strip(), "", msg="error in evKeys:\n%s" % evKeysOrigErr)
-            self.assertEqual(smlDataErr.strip(), "", msg="error in smldata cmd:\n%s" % smlDataErr)
-            self.assertEqual(evKeysSmdErr.strip(),"", msg="error in smd evKeys\n%s" % evKeysSmdErr)
+            self.assertEqual(evKeysOrigErr.strip(), "", msg=fmtErr(evKeysOrigCmd, evKeysOrigOut, evKeysOrigErr))
+            self.assertEqual(smlDataErr.strip(), "", msg=fmtErr(smlDataCmd, smlDataOut, smlDataErr))
+            self.assertEqual(evKeysSmdErr.strip(),"", msg=fmtErr(evKeysSmdCmd, evKeysSmdOut, evKeysSmdErr))
             evKeysXtcOutFname = os.path.join(self.outputDir, "test_%3.3d_evKeys_xtc.out" % testNo)
             evKeysSmdOutFname = os.path.join(self.outputDir, "test_%3.3d_evKeys_smd.out" % testNo)
             write2file(evKeysXtcOutFname, evKeysOrigOut)
             write2file(evKeysSmdOutFname, evKeysSmdOut)
             diffout, differr = ptl.cmdTimeOut("diff -u %s %s" % (evKeysXtcOutFname, evKeysSmdOutFname))
-            self.assertEqual(diffout, "", msg="evKeys output differs:\n%s" % diffout)
+            if testNo in testsWithSameEventKeys:
+                self.assertEqual(diffout, "", msg="evKeys output differ. dir=%s:\n%s" % (self.outputDir, diffout))
+            elif diffout != '':
+                print "== diffout error =="
+                print diffout
             lastTestTime = time.time()-t0

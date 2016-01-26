@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-41
+2016-1-26 David Schneider
+- extend pdsdata unit test to cover smldata generation of files with
+  incomplete contribution, see JIRA PSAS-212
+
 Tag: V00-08-40
 2016-1-22 David Schneider
 - add unit tests for pdsdata, currently just test some cases of the smldata
