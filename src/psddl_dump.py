@@ -5467,6 +5467,102 @@ def Bld_BldDataAnalogInputV1_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def Andor3d_ConfigV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Andor3d.ConfigV1.TypeId
+    assert obj.Version == psana.Andor3d.ConfigV1.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'width: %s' % uint32_to_str( obj.width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'height: %s' % uint32_to_str( obj.height() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSensors: %s' % uint32_to_str( obj.numSensors() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'orgX: %s' % uint32_to_str( obj.orgX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'orgY: %s' % uint32_to_str( obj.orgY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binX: %s' % uint32_to_str( obj.binX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binY: %s' % uint32_to_str( obj.binY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureTime: %s' % float_to_str( obj.exposureTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'coolingTemp: %s' % float_to_str( obj.coolingTemp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'baselineClamp: %s' % uint8_to_str( obj.baselineClamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'highCapacity: %s' % uint8_to_str( obj.highCapacity() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gainIndex: %s' % uint8_to_str( obj.gainIndex() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutSpeedIndex: %s' % uint16_to_str( obj.readoutSpeedIndex() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureEventCode: %s' % uint16_to_str( obj.exposureEventCode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureStartDelay: %s' % uint32_to_str( obj.exposureStartDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numDelayShots: %s' % uint32_to_str( obj.numDelayShots() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameSize: %s' % uint32_to_str( obj.frameSize() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsX: %s' % uint32_to_str( obj.numPixelsX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsY: %s' % uint32_to_str( obj.numPixelsY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsPerSensor: %s' % uint32_to_str( obj.numPixelsPerSensor() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixels: %s' % uint32_to_str( obj.numPixels() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fanMode:\n'
+    methodStr += enum_to_str(obj.fanMode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def Andor3d_FrameV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Andor3d.FrameV1.TypeId
+    assert obj.Version == psana.Andor3d.FrameV1.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'shotIdStart: %s' % uint32_to_str( obj.shotIdStart() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutTime: %s' % float_to_str( obj.readoutTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'temperature: %s' % ndarray_to_str( obj.temperature() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data: %s' % ndarray_to_str( obj.data() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def Arraychar_DataV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Arraychar.DataV1.TypeId
     assert obj.Version == psana.Arraychar.DataV1.Version
@@ -8307,6 +8403,8 @@ objFunctionTable = {
     (psana.Alias.ConfigV1.TypeId,1) : Alias_ConfigV1_to_str,
     (psana.Andor.ConfigV1.TypeId,1) : Andor_ConfigV1_to_str,
     (psana.Andor.FrameV1.TypeId,1) : Andor_FrameV1_to_str,
+    (psana.Andor3d.ConfigV1.TypeId,1) : Andor3d_ConfigV1_to_str,
+    (psana.Andor3d.FrameV1.TypeId,1) : Andor3d_FrameV1_to_str,
     (psana.Arraychar.DataV1.TypeId,1) : Arraychar_DataV1_to_str,
     (psana.Bld.BldDataAcqADCV1.TypeId,1) : Bld_BldDataAcqADCV1_to_str,
     (psana.Bld.BldDataAnalogInputV1.TypeId,1) : Bld_BldDataAnalogInputV1_to_str,
