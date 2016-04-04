@@ -14,7 +14,7 @@ reverse time order.
 Tag: V00-08-43
 2016-4-4 David Schneider
 - update to pdsdata 8.6.7 for UsdUsb::FexConfigV1,FexDataV1 and Generic1D::ConfigV0,DataV0
-- add by hand dump of generic1D data
+- add by hand dump of generic1D data - needs detector xface - JIRA PSAS-226
 - update psanaTestLib to handle test data directories that are unfinished - no runs in them	
 - update regression test files:
   - calculate md5sums of current test data (update data/previousDump.txt)
