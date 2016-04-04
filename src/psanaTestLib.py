@@ -246,7 +246,11 @@ def getMultiDatasets():
             xtcFiles.append(xtcFile)
         runs = list(runs)
         runs.sort()
+        if len(runs)==0:
+            print("warning: no runs in %s, skipping" % multiDir)
+            continue
         expname = '_'.join(multiDir.split('_')[2:])
+        expname = expname.split('_')[0]
         res[number] = {'basedir': multiDir,
                        'basepath': multiDirPath,
                        'xtcs': xtcFiles,

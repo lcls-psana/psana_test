@@ -269,6 +269,151 @@ but 0x0 in the hdf5 translation.
 This looks like the same thing as test 8
     </comment>
   </regress>
+  <regress src="multi" number="20">
+    <diff>
+<![CDATA[
+1296c1296
+<       DetInfo(XppEndstation.0:USDUSB.0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+1298c1298
+<       DetInfo(XppEndstation.0:USDUSB.0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+1300c1300
+<       DetInfo(XppEndstation.0:USDUSB.0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+1302c1302
+<       DetInfo(XppEndstation.0:USDUSB.0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+1304c1304
+<       DetInfo(XppEndstation.0:USDUSB.0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+1306c1306
+<       DetInfo(XppEndstation.0:USDUSB.0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+1308c1308
+<       DetInfo(XppEndstation.0:USDUSB.0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+1310c1310
+<       DetInfo(XppEndstation.0:USDUSB.0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+1312c1312
+<       DetInfo(XppEndstation.0:USDUSB.0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+1314c1314
+<       DetInfo(XppEndstation.0:USDUSB.0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+1316c1316
+<       DetInfo(XppEndstation.0:USDUSB.0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+1318c1318
+<       DetInfo(XppEndstation.0:USDUSB.0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+1320c1320
+<       DetInfo(XppEndstation.0:USDUSB.0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+1322c1322
+<       DetInfo(XppEndstation.0:USDUSB.0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+1324c1324
+<       DetInfo(XppEndstation.0:USDUSB.0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+2456c2456
+< type=psana.L3T.DataV2, src=ProcInfo(172.21.22.61, pid=30545)
+---
+> type=psana.L3T.DataV2, src=ProcInfo(172.21.22.149, pid=19932)
+2681c2681
+< type=psana.L3T.DataV2, src=ProcInfo(172.21.22.99, pid=18572)
+---
+> type=psana.L3T.DataV2, src=ProcInfo(172.21.22.149, pid=19932)
+2916c2916
+< type=psana.L3T.DataV2, src=ProcInfo(172.21.22.62, pid=21998)
+---
+> type=psana.L3T.DataV2, src=ProcInfo(172.21.22.149, pid=19932)
+3145c3145
+< type=psana.L3T.DataV2, src=ProcInfo(172.21.22.61, pid=30545)
+---
+> type=psana.L3T.DataV2, src=ProcInfo(172.21.22.149, pid=19932)
+3386c3386
+< type=psana.L3T.DataV2, src=ProcInfo(172.21.22.99, pid=18572)
+---
+> type=psana.L3T.DataV2, src=ProcInfo(172.21.22.149, pid=19932)
+3611c3611
+< type=psana.L3T.DataV2, src=ProcInfo(172.21.22.158, pid=5475)
+---
+> type=psana.L3T.DataV2, src=ProcInfo(172.21.22.149, pid=19932)
+4069c4069
+< type=psana.L3T.DataV2, src=ProcInfo(172.21.22.99, pid=18572)
+---
+> type=psana.L3T.DataV2, src=ProcInfo(172.21.22.149, pid=19932)
+]]>
+    </diff>
+    <comment>
+The first differences is with Configure:0000/EvrData::IOConfigV2/Control/channels.
+This data type specifies a number of infos, the max is 16. For this data, it specifies 1.
+However in the xtc, DetInfo(XppEndstation.0:USDUSB.0) is specified for all of them.
+If one looks at the translation, one finds that DetInfo(XppEndstation.0:USDUSB.0) is also 
+specified for all of them.
+
+So it must be that when psana reads back the hdf5, it does it a little differently then
+reading back the xtc. Since there is only 1 info, it is only reading the first infos value,
+so for the other 15 channels we diff this default value of ProcInfo(255.255.255.255) to
+the USDUSB. Or it psana_test.dump, but I don't think so, I think is is hdf2psana.
+
+But it is fine to to that, so we will just record it as a diff.
+
+The difference in the src for L3T, I don't think that is of much concern.
+
+The datatype looks like this in the hdf5:
+
+channels                 Dataset {1/1}
+    Type:      struct {
+                   "output"           +0    struct {
+                       "source"           +0    enum native short {    # this is 0=Pulse in the translation
+                           Pulse            = 0
+                           DBus             = 1
+                           Prescaler        = 2
+                           Force_High       = 3
+                           Force_Low        = 4
+                       }
+                       "source_id"        +2    native unsigned char # this is 255
+                       "conn"             +4    enum native short {  # this is UnivIO in the translation
+                           FrontPanel       = 0
+                           UnivIO           = 1
+                       }
+                       "conn_id"          +6    native unsigned char    # this is 8
+                       "module"           +7    native unsigned char    # this is 0
+                   } 8 bytes
+                   "name"             +8    variable-length null-terminated ASCII string   # this is usbencoder
+                   "ninfo"            +16   native unsigned int                            # this is 1 ** THIS IS WHY WE HAVE DIFF **
+                   "infos"            +24   [16] struct {
+                           "processId"        +0    native unsigned int
+                           "detector"         +8    variable-length null-terminated ASCII string
+                           "detId"            +16   native unsigned int
+                           "device"           +24   variable-length null-terminated ASCII string
+                           "devId"            +32   native unsigned int
+                       } 40 bytes
+               } 664 bytes
+
+Since ninfo is 1, the translator is only writing one of the infos. It writes
+{3530, "XppEndstation", 0, "USDUSB", 0}, which agrees 
+This looks like the same thing as test 8
+    </comment>
+  </regress>
 
 
 </data>

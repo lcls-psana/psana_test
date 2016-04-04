@@ -31,6 +31,43 @@ def OceanOptics_nonLinearCorrected(obj, indent, lvl):
     methodStr += 'nonlinearCorrected: %s' % ndarray_to_str( nonlinearCorrected )
     return methodStr
 
+def UsdUsb_FexConfig_name(obj, indent, lvl):
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'names: %s' % ','.join([obj.name(ch) for ch in range(obj.NCHANNELS)])
+    return methodStr
+
+def Generic1D_Config_data_offset(obj, indent, lvl):
+  methodStr = doIndent(indent, lvl)
+  methodStr += "depth[channel]= "
+  methodStr += ','.join(['%d' % obj.data_offset(ch) for ch in range(obj.NChannels())])
+  return methodStr
+                                   
+def Generic1D_Config_Depth(obj, indent, lvl):
+  methodStr = doIndent(indent, lvl)
+  methodStr += "Depth[channel]= "
+  methodStr += ','.join(['%d' % obj.data_offset(ch) for ch in range(obj.NChannels())])
+  return methodStr
+                     
+
+def Generic1D_Data_channel_data(obj, indent, lvl):
+  methodStrs = []
+  ch = -1
+  while True:
+    ch += 1
+    arrtypes = ['data_u8', 'data_u16', 'data_u32', 'data_f32', 'data_f64']
+    ch_has_array = False
+    while len(arrtypes)>0:
+      arr = getattr(obj, arrtypes.pop())(ch)
+      if arr.shape[0]>0:
+        ch_has_array = True
+        methodStr = doIndent(indent, lvl)
+        methodStr += 'ch:%3.3d %s' % (ch,ndarray_to_str(arr))                      
+        methodStrs.append(methodStr)
+        break
+    if not ch_has_array:
+      break
+  return methodStrs
+                                        
 # functions to dump psana objects to a string                    
 def Pds_ClockTime_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
@@ -1204,6 +1241,43 @@ def FCCD_FccdConfigV2_to_str(obj, indent, lvl, methodSep):
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'trimmedHeight: %s' % uint32_to_str( obj.trimmedHeight() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def Generic1D_ConfigV0_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Generic1D.ConfigV0.TypeId
+    assert obj.Version == psana.Generic1D.ConfigV0.Version
+    methodStrings = []
+    methodStrings.append(Generic1D_Config_data_offset(obj, indent, lvl))
+    methodStrings.append(Generic1D_Config_Depth(obj, indent, lvl))
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'NChannels: %s' % uint32_to_str( obj.NChannels() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'Length: %s' % ndarray_to_str( obj.Length() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'SampleType: %s' % ndarray_to_str( obj.SampleType() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'Offset: %s' % ndarray_to_str( obj.Offset() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'Period: %s' % ndarray_to_str( obj.Period() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def Generic1D_DataV0_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Generic1D.DataV0.TypeId
+    assert obj.Version == psana.Generic1D.DataV0.Version
+    methodStrings = []
+    methodStrings.extend(Generic1D_Data_channel_data(obj, indent, lvl))
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data_size: %s' % uint32_to_str( obj.data_size() )
     methodStrings.append(methodStr)                                 
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
@@ -5577,6 +5651,32 @@ def Arraychar_DataV1_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def UsdUsb_FexConfigV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.UsdUsb.FexConfigV1.TypeId
+    assert obj.Version == psana.UsdUsb.FexConfigV1.Version
+    methodStrings = []
+    methodStrings.append(UsdUsb_FexConfig_name(obj, indent, lvl))
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'offset: %s' % ndarray_to_str( obj.offset() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'scale: %s' % ndarray_to_str( obj.scale() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def UsdUsb_FexDataV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.UsdUsb.FexDataV1.TypeId
+    assert obj.Version == psana.UsdUsb.FexDataV1.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'encoder_values: %s' % ndarray_to_str( obj.encoder_values() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def UsdUsb_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.UsdUsb.ConfigV1.TypeId
     assert obj.Version == psana.UsdUsb.ConfigV1.Version
@@ -8473,6 +8573,8 @@ objFunctionTable = {
     (psana.FCCD.FccdConfigV2.TypeId,2) : FCCD_FccdConfigV2_to_str,
     (psana.Fli.ConfigV1.TypeId,1) : Fli_ConfigV1_to_str,
     (psana.Fli.FrameV1.TypeId,1) : Fli_FrameV1_to_str,
+    (psana.Generic1D.ConfigV0.TypeId,0) : Generic1D_ConfigV0_to_str,
+    (psana.Generic1D.DataV0.TypeId,0) : Generic1D_DataV0_to_str,
     (psana.GenericPgp.ConfigV1.TypeId,1) : GenericPgp_ConfigV1_to_str,
     (psana.Gsc16ai.ConfigV1.TypeId,1) : Gsc16ai_ConfigV1_to_str,
     (psana.Gsc16ai.DataV1.TypeId,1) : Gsc16ai_DataV1_to_str,
@@ -8533,6 +8635,8 @@ objFunctionTable = {
     (psana.Timepix.DataV2.TypeId,2) : Timepix_DataV2_to_str,
     (psana.UsdUsb.ConfigV1.TypeId,1) : UsdUsb_ConfigV1_to_str,
     (psana.UsdUsb.DataV1.TypeId,1) : UsdUsb_DataV1_to_str,
+    (psana.UsdUsb.FexConfigV1.TypeId,1) : UsdUsb_FexConfigV1_to_str,
+    (psana.UsdUsb.FexDataV1.TypeId,1) : UsdUsb_FexDataV1_to_str,
 } # end dispatch table
 
 

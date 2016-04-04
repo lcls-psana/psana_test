@@ -56,6 +56,43 @@ def OceanOptics_nonLinearCorrected(obj, indent, lvl):
     methodStr += 'nonlinearCorrected: %s' % ndarray_to_str( nonlinearCorrected )
     return methodStr
 
+def UsdUsb_FexConfig_name(obj, indent, lvl):
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'names: %s' % ','.join([obj.name(ch) for ch in range(obj.NCHANNELS)])
+    return methodStr
+
+def Generic1D_Config_data_offset(obj, indent, lvl):
+  methodStr = doIndent(indent, lvl)
+  methodStr += "depth[channel]= "
+  methodStr += ','.join(['%d' % obj.data_offset(ch) for ch in range(obj.NChannels())])
+  return methodStr
+                                   
+def Generic1D_Config_Depth(obj, indent, lvl):
+  methodStr = doIndent(indent, lvl)
+  methodStr += "Depth[channel]= "
+  methodStr += ','.join(['%d' % obj.data_offset(ch) for ch in range(obj.NChannels())])
+  return methodStr
+                     
+
+def Generic1D_Data_channel_data(obj, indent, lvl):
+  methodStrs = []
+  ch = -1
+  while True:
+    ch += 1
+    arrtypes = ['data_u8', 'data_u16', 'data_u32', 'data_f32', 'data_f64']
+    ch_has_array = False
+    while len(arrtypes)>0:
+      arr = getattr(obj, arrtypes.pop())(ch)
+      if arr.shape[0]>0:
+        ch_has_array = True
+        methodStr = doIndent(indent, lvl)
+        methodStr += 'ch:%3.3d %s' % (ch,ndarray_to_str(arr))                      
+        methodStrs.append(methodStr)
+        break
+    if not ch_has_array:
+      break
+  return methodStrs
+                                        
 # functions to dump psana objects to a string                    
 {% for psana_type in psana_types %}
 {% set namespace = psana_type.namespace %}
@@ -74,6 +111,16 @@ def {{namespace}}_{{classname}}_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
 {% if namespace == 'OceanOptics' and classname.startswith('DataV') %}
     methodStrings.append(OceanOptics_nonLinearCorrected(obj, indent, lvl))
+{% endif %}
+{% if namespace == 'UsdUsb' and classname.startswith('FexConfigV') %}
+    methodStrings.append(UsdUsb_FexConfig_name(obj, indent, lvl))
+{% endif %}
+{% if namespace == 'Generic1D' and classname.startswith('ConfigV') %}
+    methodStrings.append(Generic1D_Config_data_offset(obj, indent, lvl))
+    methodStrings.append(Generic1D_Config_Depth(obj, indent, lvl))
+{% endif %}
+{% if namespace == 'Generic1D' and classname.startswith('DataV') %}
+    methodStrings.extend(Generic1D_Data_channel_data(obj, indent, lvl))
 {% endif %}
 {% if one_line_methods %}
     # one_line_methods

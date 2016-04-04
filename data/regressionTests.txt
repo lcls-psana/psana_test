@@ -57,3 +57,4 @@ test=000  events=000 doNotDumpEpicsAliases=1 multi=/reg/g/psdm/data_test/multifi
 test=001  events=000 doNotDumpEpicsAliases=1 multi=/reg/g/psdm/data_test/multifile/test_001_xppcom10
 test=002  events=000 doNotDumpEpicsAliases=1 multi=/reg/g/psdm/data_test/multifile/test_002_xppd9714
 test=003  events=000 doNotDumpEpicsAliases=1 multi=/reg/g/psdm/data_test/multifile/test_003_xpptut13
+test=020  events=010 doNotDumpEpicsAliases=1 multi=/reg/g/psdm/data_test/multifile/test_020_xpp00316
