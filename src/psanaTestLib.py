@@ -760,8 +760,15 @@ def makeTypeLinks(args):
     if 'noEpics' in args:
         doEpics = False
     linksMade = set()
-    for testNum, testInfo in getTestFiles(noTranslator=True).iteritems():
-        basename, fullPath = (testInfo['basename'], testInfo['path'])
+
+    xtcpaths = []
+    for testInfo in getTestFiles(noTranslator=True).values():
+        xtcpaths.append(testInfo['path'])
+    for multiDict in getMultiDatasets().values():
+        for xtc in multiDict['xtcs']:
+            xtcpaths.append(os.path.join(multiDict['basepath'], xtc))
+
+    for fullPath in xtcpaths:
         if doTypes:
             types = getPsanaTypes(fullPath, None)
             for tp in types:
@@ -1165,14 +1172,15 @@ def getValidTypeVersions(fullPath, dgrams=-1, getCompressedAndUncompressedVersio
     if dgrams > -1:
         cmd += ' --dgrams=%d' % dgrams
     o,e = cmdTimeOut(cmd,5*60)
-    assert len(e)==0, "Failure running cmd=%s\nError=%s" % (cmd,e)
+    if len(e)!=0:
+        sys.stderr.write("WARNING: failure running cmd=%s\nError=%s\n" % (cmd,e))
     for ln in o.split('\n'):
         ret = getValidTypeVerFromXtcLineDumpLine(ln, fullPath)
         if ret is None: continue
-        typeid, version = ret
+        type_name, typeid, version = ret
         if not getCompressedAndUncompressedVersions:
             version = 0x7FFF & version
-        typeVersions.add((typeid,version))
+        typeVersions.add((type_name, typeid, version))
     return typeVersions
 
 def getValidTypeVerFromXtcLineDumpLine(origLn, xtcFileName=''):
@@ -1194,19 +1202,31 @@ def getValidTypeVerFromXtcLineDumpLine(origLn, xtcFileName=''):
         assert dmg != 0, "unexpected, payload says damaged, but dmg is 0.\nln=%s\nxtc=%s" % \
                       (origLn, xtcFileName)
         return None
+    jnk, type_name = origLn.split(' type_name=')
+    type_name = type_name.split(' plen=')[0]
     ln, version = ln.split(' ver=')
     ln, typeid = ln.split(' typeid=')
     typeid, version = map(int, (typeid, version))
     if typeid > numTypes: return None
-    return (typeid, version)
+    return (type_name, typeid, version)
 
 def getDataTestTypeVersions():
     print "finding type/version info in test data"
+    xtcPaths = []
     xtcDict = getTestFiles(noTranslator=True)
+    for valDict in xtcDict.values():
+        xtcPaths.append(valDict['path'])
+    multiDict = getMultiDatasets()
+    for valDict in multiDict.values():
+        for xtc in valDict['xtcs']:
+            xtcPaths.append(os.path.join(valDict['basepath'], xtc))
+
     testTypeVersions = set()
-    for testNum, xtcInfo in xtcDict.iteritems():
-        basename, fullPath = xtcInfo['basename'], xtcInfo['path']
+    for fullPath in xtcPaths:
         typeVersions = getValidTypeVersions(fullPath, dgrams=-1)
+        for typeVersion in typeVersions:
+            if typeVersion not in testTypeVersions:
+                print "new typeVersion=%s  path=%s" % (typeVersion, fullPath)
         testTypeVersions = testTypeVersions.union(typeVersions)
     return testTypeVersions
 
@@ -1552,7 +1572,7 @@ def typesCommand(args):
         newTypeVers = typeVersions.difference(currentTypeVersions)
         if len(newTypeVers)>0:
             print "Found %d new types (%s) in %s" % (len(newTypeVers), newTypeVers, xtc)
-            updateTestData(xtc,newTypeVers,dgrams)
+#            updateTestData(xtc,newTypeVers,dgrams)
             currentTypeVersions = currentTypeVersions.union(newTypeVers)
         filesScanned += 1
         if filesScanned % 50 == 0:

@@ -11,6 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-44
+2016-4-14 David Schneider
+- work on test data management, reporting new types found, 
+  look in multifile test sets for types, keep one run in each
+  multifile test
+	
 Tag: V00-08-43
 2016-4-4 David Schneider
 - update to pdsdata 8.6.7 for UsdUsb::FexConfigV1,FexDataV1 and Generic1D::ConfigV0,DataV0
