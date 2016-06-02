@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-46
+2016-6-2 David Schneider
+- update to pdsdata 8.6.10 with BldDataEOrbitsV0 JIRA PSAS-239
+  and smldata fix PSAS-237
+
 Tag: V00-08-45
 2016-4-18 David Schneider
 - update to pdsdata 8.6.8 with Andor::ConfigV2 JIRA PSAS-229

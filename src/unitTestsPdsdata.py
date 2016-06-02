@@ -17,7 +17,8 @@ import shutil
 import glob
 import time
 
-DATADIR = ptl.getTestDataDir()
+TESTDATADIR = ptl.getTestDataDir()
+MULTIDATADIR = ptl.getMultiFileDataDir()
 OUTDIR = ptl.getDataArchDir(pkg='psana_test', datasubdir='test_output')
 
 #-------------------------------
@@ -31,7 +32,8 @@ class Pdsdata( unittest.TestCase ) :
     	before calling the test method; any exception raised by this method 
     	will be considered an error rather than a test failure.  
     	"""
-        assert os.path.exists(DATADIR), "Data dir: %s does not exist, cannot run unit tests" % DATADIR
+        assert os.path.exists(TESTDATADIR), "Data dir: %s does not exist, cannot run unit tests" % TESTDATADIR
+        assert os.path.exists(MULTIDATADIR), "Data dir: %s does not exist, cannot run unit tests" % MULTIDATADIR
         assert os.path.exists(OUTDIR), "Output directory: %s does not exist, can't run unit tests" % OUTDIR
         self.outputDir = tempfile.mkdtemp(dir=OUTDIR)
         self.cleanUp = True    # delete intermediate files if True
@@ -49,6 +51,33 @@ class Pdsdata( unittest.TestCase ) :
         """
         if self.cleanUp:
             shutil.rmtree(self.outputDir)
+
+    def test_smlDataDamageContributed(self):
+        '''
+        JIRA PSAS-237 - the contributed damage was 
+        causing smldata problems
+        '''
+        testdir = os.path.join(MULTIDATADIR, 'test_030_amoc0113')
+        xtc = os.path.join(testdir, 'e331-r0071-s05-c00.xtc')
+        assert os.path.exists(xtc), "testfile: %s doesn't exist" % xtc
+        xtcdir = os.path.join(self.outputDir, "contrib_damage")
+        smldatadir = os.path.join(xtcdir, 'smalldata')
+        if not os.path.exists(xtcdir):
+            os.mkdir(xtcdir)
+        if not os.path.exists(smldatadir):
+            os.mkdir(smldatadir)
+        try:
+            os.symlink(xtc, os.path.join(xtcdir, os.path.basename(xtc)))
+        except OSError:
+            pass
+        smloutput = os.path.join(smldatadir, 'e331-r0071-s05-c00.smd.xtc')
+        cmd = 'smldata -f %s -o %s' % (xtc, smloutput)
+        stdout, stderr = ptl.cmdTimeOut(cmd)
+        assert stderr.strip()=='', "error with cmd=%s err=%s" % (cmd, stderr)
+        cmd = 'psana -n 3 -m psana_test.dump '
+        cmd += 'exp=amoc0113:run=71:smd:dir=%s' % xtcdir
+        stdout, stderr = ptl.cmdTimeOut(cmd)
+        self.assertTrue(stderr.strip()=='', msg="error from cmd = %s, err=%s" % (cmd, stderr))
 
     def test_smldata(self):
         def write2file(fname, txt):
@@ -68,7 +97,7 @@ class Pdsdata( unittest.TestCase ) :
                 msg += stderr
                 msg += '\n'
             return msg
-        xtcs = glob.glob(os.path.join(DATADIR, "test_*_*.xtc"))
+        xtcs = glob.glob(os.path.join(TESTDATADIR, "test_*_*.xtc"))
         smdbases = [os.path.basename(xtc)[0:-3] + "smd.xtc" for xtc in xtcs]
         try:
             os.mkdir(os.path.join(self.outputDir, "smalldata"))

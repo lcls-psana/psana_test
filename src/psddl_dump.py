@@ -5342,6 +5342,26 @@ def Bld_BldDataEBeamV7_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def Bld_BldDataEOrbitsV0_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Bld.BldDataEOrbitsV0.TypeId
+    assert obj.Version == psana.Bld.BldDataEOrbitsV0.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'nBPMS: %s' % uint32_to_str( obj.nBPMS() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fBPM_X: %s' % ndarray_to_str( obj.fBPM_X() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fBPM_Y: %s' % ndarray_to_str( obj.fBPM_Y() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fBPM_TMIT: %s' % ndarray_to_str( obj.fBPM_TMIT() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def Bld_BldDataPhaseCavity_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataPhaseCavity.TypeId
     assert obj.Version == psana.Bld.BldDataPhaseCavity.Version
@@ -8588,6 +8608,7 @@ objFunctionTable = {
     (psana.Bld.BldDataEBeamV5.TypeId,5) : Bld_BldDataEBeamV5_to_str,
     (psana.Bld.BldDataEBeamV6.TypeId,6) : Bld_BldDataEBeamV6_to_str,
     (psana.Bld.BldDataEBeamV7.TypeId,7) : Bld_BldDataEBeamV7_to_str,
+    (psana.Bld.BldDataEOrbitsV0.TypeId,0) : Bld_BldDataEOrbitsV0_to_str,
     (psana.Bld.BldDataFEEGasDetEnergy.TypeId,0) : Bld_BldDataFEEGasDetEnergy_to_str,
     (psana.Bld.BldDataFEEGasDetEnergyV1.TypeId,1) : Bld_BldDataFEEGasDetEnergyV1_to_str,
     (psana.Bld.BldDataGMDV0.TypeId,0) : Bld_BldDataGMDV0_to_str,
