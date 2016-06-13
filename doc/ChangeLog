@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-47
+2016-6-13 David Schneider
+- update to pdsdata 8.6.12 for Partition::ConfigV2 JIRA PSAS-241
+
 Tag: V00-08-46
 2016-6-2 David Schneider
 - update to pdsdata 8.6.10 with BldDataEOrbitsV0 JIRA PSAS-239

@@ -7557,6 +7557,41 @@ def Partition_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def Partition_ConfigV2_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Partition.ConfigV2.TypeId
+    assert obj.Version == psana.Partition.ConfigV2.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numWords: %s' % uint32_to_str( obj.numWords() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSources: %s' % uint32_to_str( obj.numSources() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'bldMask: %s' % ndarray_to_str( obj.bldMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numBldMaskBits: %s' % uint32_to_str( obj.numBldMaskBits() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'bldMaskIsZero: %s' % uint32_to_str( obj.bldMaskIsZero() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'bldMaskIsNotZero: %s' % uint32_to_str( obj.bldMaskIsNotZero() )
+    methodStrings.append(methodStr)                                 
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.sources() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'sources[%d]:\n' % idx
+        subMethodStr += Partition_Source_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def EpixSampler_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.EpixSampler.ConfigV1.TypeId
     assert obj.Version == psana.EpixSampler.ConfigV1.Version
@@ -8698,6 +8733,7 @@ objFunctionTable = {
     (psana.PNCCD.ConfigV2.TypeId,2) : PNCCD_ConfigV2_to_str,
     (psana.PNCCD.FramesV1.TypeId,1) : PNCCD_FramesV1_to_str,
     (psana.Partition.ConfigV1.TypeId,1) : Partition_ConfigV1_to_str,
+    (psana.Partition.ConfigV2.TypeId,2) : Partition_ConfigV2_to_str,
     (psana.Pimax.ConfigV1.TypeId,1) : Pimax_ConfigV1_to_str,
     (psana.Pimax.FrameV1.TypeId,1) : Pimax_FrameV1_to_str,
     (psana.Princeton.ConfigV1.TypeId,1) : Princeton_ConfigV1_to_str,
