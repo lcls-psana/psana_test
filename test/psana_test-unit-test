@@ -9,8 +9,10 @@ from psana_test.unitTests import *
 from psana_test.psanaTestLib import testCommand
 
 if __name__ == "__main__":
-    # run the long regression test
-    testCommand(["verbose=True"])
+    # rhel5 build machine is heavily loaded, skip tests here
+    if not os.environ['SIT_ARCH'].find('-rhel5-')>0:
+        # run the long regression test
+        testCommand(["verbose=True"])
 
     # now run the tests in unitTests, this routine does not return.
     unittest.main(argv=[sys.argv[0], '-v'])
