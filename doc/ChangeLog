@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-49
+2016-7-21 David Schneider
+- disable extpackage tests because they fail or draw in too many 
+  dependecies in conda
+	
 Tag: V00-08-48
 2016-6-14 David Schneider
 - disable unit tests on rhel5 build machine because it is too loaded
