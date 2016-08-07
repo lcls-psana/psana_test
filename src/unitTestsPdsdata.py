@@ -19,7 +19,6 @@ import time
 
 TESTDATADIR = ptl.getTestDataDir()
 MULTIDATADIR = ptl.getMultiFileDataDir()
-OUTDIR = ptl.getDataArchDir(pkg='psana_test', datasubdir='test_output')
 
 #-------------------------------
 #  Unit test class definition --
@@ -34,8 +33,7 @@ class Pdsdata( unittest.TestCase ) :
     	"""
         assert os.path.exists(TESTDATADIR), "Data dir: %s does not exist, cannot run unit tests" % TESTDATADIR
         assert os.path.exists(MULTIDATADIR), "Data dir: %s does not exist, cannot run unit tests" % MULTIDATADIR
-        assert os.path.exists(OUTDIR), "Output directory: %s does not exist, can't run unit tests" % OUTDIR
-        self.outputDir = tempfile.mkdtemp(dir=OUTDIR)
+        self.outputDir = tempfile.mkdtemp()
         self.cleanUp = True    # delete intermediate files if True
         self.verbose = False   # print psana output, ect
 
@@ -142,3 +140,6 @@ class Pdsdata( unittest.TestCase ) :
                 print "== diffout error =="
                 print diffout
             lastTestTime = time.time()-t0
+
+if __name__ == "__main__":
+    unittest.main(argv=[sys.argv[0], '-v'])

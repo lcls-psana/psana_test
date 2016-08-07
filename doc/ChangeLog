@@ -11,6 +11,13 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-50
+2016-8-6 David Schneider
+- use /tmp for test output
+- remove interface to getting output directory within release
+- introduce new class with context manager for writing to temp files
+- shorten number of tests, get testing to go faster
+	
 Tag: V00-08-49
 2016-7-21 David Schneider
 - disable extpackage tests because they fail or draw in too many 

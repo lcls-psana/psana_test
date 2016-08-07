@@ -25,12 +25,10 @@ import numpy as np
 from psana_test import epicsPvToStr
 import psana_test.psanaTestLib as ptl
 import psana_test.liveModeSimLib as liveModeLib
-
-from AppUtils.AppDataPath import AppDataPath
+from psana_test.TestOutputDir import outputDir
 import multiprocessing
 
 DATADIR = ptl.getTestDataDir()
-OUTDIR = ptl.getDataArchDir(pkg='psana_test', datasubdir='test_output')
 
 #------------------
 # Utility functions 
@@ -56,11 +54,6 @@ def getLinesBeforeAndAfterPos(string,pos,linesBefore,linesAfter):
             break
     return startPos, endPos
 
-def getH5OutfileName(path):
-    basename = os.path.basename(path)
-    h5basename = os.path.splitext(basename)[0] + '.h5'
-    return os.path.join(OUTDIR,h5basename)
-
 #-------------------------------
 #  Unit test class definition --
 #-------------------------------
@@ -73,7 +66,6 @@ class Psana( unittest.TestCase ) :
     	will be considered an error rather than a test failure.  
     	"""
         assert os.path.exists(DATADIR), "Data dir: %s does not exist, cannot run unit tests" % DATADIR
-        assert os.path.exists(OUTDIR), "Output directory: %s does not exist, can't run unit tests" % OUTDIR
         self.cleanUp = True    # delete intermediate files if True
         self.verbose = False    # print psana output, ect
 
@@ -146,7 +138,7 @@ class Psana( unittest.TestCase ) :
         except:
             self.assertTrue(False,msg="program cannot write the file: %s check for permission issues" % outFile)
         fout.close()
-        os.unlink(outFile)
+        time.sleep(.3)
         self.runPsanaOnCfg(cmdLineOptions=cmdLine)
         self.assertTrue(os.path.exists(outFile), msg="Translation did not produce outfile: %s" % outFile)
 
@@ -165,33 +157,34 @@ class Psana( unittest.TestCase ) :
             nevent+=1
             if nevent>=4:
                 break
-        myfile = os.path.join(OUTDIR,'savetimes.pkl')
-        f=open(myfile,'wb')
-        pickle.dump(savetimes, f)
-        f.close()
-        # check that we get the right events back using the pickled EventTime objects
-        f=open(myfile,'rb')
-        times = pickle.load(f)
-        f.close()
-        os.remove(myfile)
-        ds = psana.DataSource('dir=%s:exp=xcstut13:run=999:idx' % dataSourceDir)
-        run = ds.runs().next()
-        expectFid = [5366,11177,14060]
-        expectSec = [1339858956,1339858972,1339858980]
-        expectNsec = [671607864,816395836,826443448]
-        for i in range(len(times)):
-            id = run.event(times[i]).get(psana.EventId)
-            self.assertEqual(id.fiducials(), expectFid[i], msg="incorrect fiducials from indexing. found %d, expect %d" % (id.fiducials(), expectFid[i]))
-            self.assertEqual(id.time()[0], expectSec[i], msg="incorrect seconds from indexing. found %d, expect %d" % (id.time()[0],expectSec[i]))
-            self.assertEqual(id.time()[1], expectNsec[i], msg="incorrect nanoseconds from indexing. found %d, expect %d" % (id.time()[1],expectNsec[i]))
-        self.assertEqual(run.nsteps(), 5, msg="incorrect number of calibsteps from indexing. found %d, expect 5" % run.nsteps())
-        # test that the calibcycle interface can also get a correct event
-        calibtimes = run.times(2)
-        self.assertEqual(len(calibtimes), 1, msg="incorrect number of events in calibstep. found %d, expect 1" % len(calibtimes))
-        id = run.event(calibtimes[0]).get(psana.EventId)
-        self.assertEqual(id.fiducials(), expectFid[1], msg="incorrect fiducials from calibcycle-indexing. found %d, expect %d" % (id.fiducials(), expectFid[1]))
-        self.assertEqual(id.time()[0], expectSec[1], msg="incorrect seconds from calibcycle-indexing. found %d, expect %d" % (id.time()[0],expectSec[1]))
-        self.assertEqual(id.time()[1], expectNsec[1], msg="incorrect nanoseconds from calibcycle-indexing. found %d, expect %d" % (id.time()[1],expectNsec[1]))
+        with outputDir('psutst') as outdir:
+            myfile = outdir.fullpath('savetimes.pkl')
+            f=open(myfile,'wb')
+            pickle.dump(savetimes, f)
+            f.close()
+            # check that we get the right events back using the pickled EventTime objects
+            f=open(myfile,'rb')
+            times = pickle.load(f)
+            f.close()
+            os.remove(myfile)
+            ds = psana.DataSource('dir=%s:exp=xcstut13:run=999:idx' % dataSourceDir)
+            run = ds.runs().next()
+            expectFid = [5366,11177,14060]
+            expectSec = [1339858956,1339858972,1339858980]
+            expectNsec = [671607864,816395836,826443448]
+            for i in range(len(times)):
+                id = run.event(times[i]).get(psana.EventId)
+                self.assertEqual(id.fiducials(), expectFid[i], msg="incorrect fiducials from indexing. found %d, expect %d" % (id.fiducials(), expectFid[i]))
+                self.assertEqual(id.time()[0], expectSec[i], msg="incorrect seconds from indexing. found %d, expect %d" % (id.time()[0],expectSec[i]))
+                self.assertEqual(id.time()[1], expectNsec[i], msg="incorrect nanoseconds from indexing. found %d, expect %d" % (id.time()[1],expectNsec[i]))
+            self.assertEqual(run.nsteps(), 5, msg="incorrect number of calibsteps from indexing. found %d, expect 5" % run.nsteps())
+            # test that the calibcycle interface can also get a correct event
+            calibtimes = run.times(2)
+            self.assertEqual(len(calibtimes), 1, msg="incorrect number of events in calibstep. found %d, expect 1" % len(calibtimes))
+            id = run.event(calibtimes[0]).get(psana.EventId)
+            self.assertEqual(id.fiducials(), expectFid[1], msg="incorrect fiducials from calibcycle-indexing. found %d, expect %d" % (id.fiducials(), expectFid[1]))
+            self.assertEqual(id.time()[0], expectSec[1], msg="incorrect seconds from calibcycle-indexing. found %d, expect %d" % (id.time()[0],expectSec[1]))
+            self.assertEqual(id.time()[1], expectNsec[1], msg="incorrect nanoseconds from calibcycle-indexing. found %d, expect %d" % (id.time()[1],expectNsec[1]))
 
     def test_MoreRecentEpicsStored(self):
         '''When the same epics pv is recorded from several sources, or several times in the same source, 
@@ -281,109 +274,110 @@ class Psana( unittest.TestCase ) :
                                            'DG4 IPM/PIM-CXI:DG4:MMS:04.RBV':('CXI:DG4:MMS:04.RBV',229),
                                            'DG4 IPM/PIM-CXI:DG4:MMS:05.RBV':('CXI:DG4:MMS:05.RBV',230),
                                        }
-        h5_outfile = getH5OutfileName(TEST_10)
-        self.h5Translate(TEST_10, h5_outfile, cmdLineOptions='-n 1')
+        with outputDir(prefix='psunt') as outDir:
+            h5_outfile = outDir.fullpath(os.path.splitext(os.path.split(TEST_10)[1])[0] + '.h5')
+            self.h5Translate(TEST_10, h5_outfile, cmdLineOptions='-n 1')
 
-        # this is the pv that is masked by an alias
-        src1_pvid_4 = {'pvname':'CXI:SC2:MZM:09:ENCPOSITIONGET', 
-                       'beginJobValue':0.0,
-                       'event0value':0.0,
-                       'event0stamp':(743137317, 444140000),
-                       'alias':'KB1 Vert Foucssing Mirror Pitch-CXI:SC2:MZM:09:ENCPOSITIONGET'}
-        # this is a different pv from a different source that has the same pvid
-        src0_pvid_4 = {'pvname':'CXI:DG3:PIC:01.RBV', 
-                       'beginJobValue':1.0005e-02,
-                       'event0value':1.0005e-02,
-                       'event0stamp':(742173122, 724943000),
-                       'alias': 'DG3 Spectrometer-CXI:DG3:PIC:01.RBV'}
-        # test xtc
-        psana.setConfigFile('')
-        dsXtc = psana.DataSource(TEST_10)
-        estore = dsXtc.env().epicsStore()
-        # the alias 'CXI:SC2:MZM:09:ENCPOSITIONGET' to the pv 'CXI:SC2:MZM:10:ENCPOSITIONGET'
-        # masks the original pv, psana should be removing this alias:
-        self.assertEqual('',estore.alias('CXI:SC2:MZM:10:ENCPOSITIONGET'), msg="xtc: psana is not removing alias 'CXI:SC2:MZM:09:ENCPOSITIONGET' for 'CXI:SC2:MZM:10:ENCPOSITIONGET' that masks pv with alias name")
-        # are pv's there
-        pv0 = estore.getPV(src0_pvid_4['pvname'])
-        pv1 = estore.getPV(src1_pvid_4['pvname'])
-        self.assertTrue(pv0 is not None, msg="xtc: src0 pvid4 pvname=%s not found during beginJob" % src0_pvid_4['pvname'])
-        self.assertTrue(pv1 is not None, msg="xtc: src1 pvid4 pvname=%s not found during beginJob" % src1_pvid_4['pvname'])
-        # right value in beginJob?
-        self.assertEqual(pv0.value(0), src0_pvid_4['beginJobValue'],msg="xtc: src0 pvid4 pvname=%s beginJob value wrong" % src0_pvid_4['pvname'])
-        self.assertEqual(pv1.value(0), src1_pvid_4['beginJobValue'],msg="xtc: src1 pvid4 pvname=%s beginJob value wrong" % src1_pvid_4['pvname'])
-        # are aliases there?
-        alias0 = estore.getPV(src0_pvid_4['alias'])
-        alias1 = estore.getPV(src1_pvid_4['alias'])
-        self.assertTrue(alias0 is not None, msg="xtc: src0 pvid4 alias=%s not found during beginJob" % src0_pvid_4['alias'])
-        self.assertTrue(alias1 is not None, msg="xtc: src1 pvid4 alias=%s not found during beginJob" % src1_pvid_4['alias'])
-        # do aliases have right value?
-        self.assertEqual(alias0.value(0), src0_pvid_4['beginJobValue'],msg="xtc: src0 pvid4 pvname=%s beginJob value wrong from alias=%s" % (src0_pvid_4['pvname'], src0_pvid_4['alias']))
-        self.assertEqual(alias1.value(0), src1_pvid_4['beginJobValue'],msg="xtc: src1 pvid4 pvname=%s beginJob value wrong from alias=%s" % (src1_pvid_4['pvname'], src1_pvid_4['alias']))
-        # check expected number of aliases and pvNames, have not verified that they are all correct, 199 and 227
-        # are what was observed when test was written
-        self.assertEqual(len(estore.aliases()), 199, msg="xtc: estore does not have expected number of aliases")
-        self.assertEqual(len(estore.pvNames()), 227, msg="xtc: estore does not have expected number of pvNames")
-        checkAliases(self, aliases, estore, "xtc configure")
-        # go to the next event
-        dsXtc.events().next()
-        pv0 = estore.getPV(src0_pvid_4['pvname'])
-        pv1 = estore.getPV(src1_pvid_4['pvname'])
-        self.assertTrue(pv0 is not None, msg="xtc: src0 pvid4 pvname=%s not found during event 0" % src0_pvid_4['pvname'])
-        self.assertTrue(pv1 is not None, msg="xtc: src1 pvid4 pvname=%s not found during event 0" % src1_pvid_4['pvname'])
-        self.assertEqual(pv0.value(0), src0_pvid_4['event0value'],msg="xtc: src0 pvid4 pvname=%s event0 value wrong" % src0_pvid_4['pvname'])
-        self.assertEqual(pv1.value(0), src1_pvid_4['event0value'],msg="xtc: src1 pvid4 pvname=%s event0 value wrong" % src1_pvid_4['pvname'])
-        self.assertEqual(pv0.stamp().sec(), src0_pvid_4['event0stamp'][0],msg="xtc: src0 pvid4 pvname=%s event0 stamp sec wrong" % src0_pvid_4['pvname'])
-        self.assertEqual(pv1.stamp().sec(), src1_pvid_4['event0stamp'][0],msg="xtc: src1 pvid4 pvname=%s event0 stamp sec wrong" % src1_pvid_4['pvname'])
-        self.assertEqual(pv0.stamp().nsec(), src0_pvid_4['event0stamp'][1],msg="xtc: src0 pvid4 pvname=%s event0 stamp sec wrong" % src0_pvid_4['pvname'])
-        self.assertEqual(pv1.stamp().nsec(), src1_pvid_4['event0stamp'][1],msg="xtc: src1 pvid4 pvname=%s event0 stamp sec wrong" % src1_pvid_4['pvname'])
-        alias0 = estore.getPV(src0_pvid_4['alias'])
-        alias1 = estore.getPV(src1_pvid_4['alias'])
-        checkAliases(self, aliases, estore, "configure")
-        self.assertTrue(alias0 is not None, msg="xtc: src0 pvid4 alias=%s not found during event0" % src0_pvid_4['alias'])
-        self.assertTrue(alias1 is not None, msg="xtc: src1 pvid4 alias=%s not found during event0" % src1_pvid_4['alias'])
-        self.assertEqual(alias0.value(0), src0_pvid_4['event0value'],msg="xtc: src0 pvid4 pvname=%s beginJob value wrong from alias=%s" % (src0_pvid_4['pvname'], src0_pvid_4['alias']))
-        self.assertEqual(alias1.value(0), src1_pvid_4['event0value'],msg="xtc: src1 pvid4 pvname=%s beginJob value wrong from alias=%s" % (src1_pvid_4['pvname'], src1_pvid_4['alias']))
-        del alias1
-        del alias0
-        del pv1
-        del pv0
-        del estore
-        del dsXtc
-        
-        psana.setConfigFile('')
-        dsH5 = psana.DataSource(h5_outfile) 
-        estore = dsH5.env().epicsStore()
-        # check expected number of aliases and pvNames, have not verified that they are all correct, 193 and 227
-        # are what was observed when test was written
-        self.assertEqual(len(estore.aliases()), 193, msg="h5: estore does not have expected number of aliases")
-        self.assertEqual(len(estore.pvNames()), 227, msg="h5: estore does not have expected number of pvNames")
-        checkAliases(self, aliases, estore, "h5 configure")
-        # are pv's there with right value?
-        pv0 = estore.getPV(src0_pvid_4['pvname'])
-        pv1 = estore.getPV(src1_pvid_4['pvname'])
-        self.assertTrue(pv0 is not None, msg="h5: src0 pvid4 pvname=%s not found during beginJob" % src0_pvid_4['pvname'])
-        self.assertTrue(pv1 is not None, msg="h5: src1 pvid4 pvname=%s not found during beginJob" % src1_pvid_4['pvname'])
-        self.assertEqual(pv0.value(0), src0_pvid_4['beginJobValue'],msg="h5: src0 pvid4 pvname=%s beginJob value wrong" % src0_pvid_4['pvname'])
-        self.assertEqual(pv1.value(0), src1_pvid_4['beginJobValue'],msg="h5: src1 pvid4 pvname=%s beginJob value wrong" % src1_pvid_4['pvname'])
-        alias0 = estore.getPV(src0_pvid_4['alias'])
-        alias1 = estore.getPV(src1_pvid_4['alias'])
-        # these aliases share the same pvid, due to limitation in psana-translate, there should only be one of them
-        self.assertTrue((alias0 is None) or (alias1 is None), msg="h5: one of the src0 pvid4 and scr1 pvid4 aliases is not none")
-        self.assertFalse((alias0 is None) and (alias1 is None), msg="h5: both the scr0 pvid4 and src1 pvid4 aliases are none")
-        # go to the next event
-        dsH5.events().next()
-        pv0 = estore.getPV(src0_pvid_4['pvname'])
-        pv1 = estore.getPV(src1_pvid_4['pvname'])
-        self.assertTrue(pv0 is not None, msg="src0 pvid4 pvname=%s not found during event 0" % src0_pvid_4['pvname'])
-        self.assertTrue(pv1 is not None, msg="src1 pvid4 pvname=%s not found during event 0" % src1_pvid_4['pvname'])
-        self.assertEqual(pv0.value(0), src0_pvid_4['event0value'],msg="src0 pvid4 pvname=%s event0 value wrong" % src0_pvid_4['pvname'])
-        self.assertEqual(pv1.value(0), src1_pvid_4['event0value'],msg="src1 pvid4 pvname=%s event0 value wrong" % src1_pvid_4['pvname'])
-        self.assertEqual(pv0.stamp().sec(), src0_pvid_4['event0stamp'][0],msg="src0 pvid4 pvname=%s event0 stamp sec wrong" % src0_pvid_4['pvname'])
-        self.assertEqual(pv1.stamp().sec(), src1_pvid_4['event0stamp'][0],msg="src1 pvid4 pvname=%s event0 stamp sec wrong" % src1_pvid_4['pvname'])
-        self.assertEqual(pv0.stamp().nsec(), src0_pvid_4['event0stamp'][1],msg="src0 pvid4 pvname=%s event0 stamp sec wrong" % src0_pvid_4['pvname'])
-        self.assertEqual(pv1.stamp().nsec(), src1_pvid_4['event0stamp'][1],msg="src1 pvid4 pvname=%s event0 stamp sec wrong" % src1_pvid_4['pvname'])
+            # this is the pv that is masked by an alias
+            src1_pvid_4 = {'pvname':'CXI:SC2:MZM:09:ENCPOSITIONGET', 
+                           'beginJobValue':0.0,
+                           'event0value':0.0,
+                           'event0stamp':(743137317, 444140000),
+                           'alias':'KB1 Vert Foucssing Mirror Pitch-CXI:SC2:MZM:09:ENCPOSITIONGET'}
+            # this is a different pv from a different source that has the same pvid
+            src0_pvid_4 = {'pvname':'CXI:DG3:PIC:01.RBV', 
+                           'beginJobValue':1.0005e-02,
+                           'event0value':1.0005e-02,
+                           'event0stamp':(742173122, 724943000),
+                           'alias': 'DG3 Spectrometer-CXI:DG3:PIC:01.RBV'}
+            # test xtc
+            psana.setConfigFile('')
+            dsXtc = psana.DataSource(TEST_10)
+            estore = dsXtc.env().epicsStore()
+            # the alias 'CXI:SC2:MZM:09:ENCPOSITIONGET' to the pv 'CXI:SC2:MZM:10:ENCPOSITIONGET'
+            # masks the original pv, psana should be removing this alias:
+            self.assertEqual('',estore.alias('CXI:SC2:MZM:10:ENCPOSITIONGET'), msg="xtc: psana is not removing alias 'CXI:SC2:MZM:09:ENCPOSITIONGET' for 'CXI:SC2:MZM:10:ENCPOSITIONGET' that masks pv with alias name")
+            # are pv's there
+            pv0 = estore.getPV(src0_pvid_4['pvname'])
+            pv1 = estore.getPV(src1_pvid_4['pvname'])
+            self.assertTrue(pv0 is not None, msg="xtc: src0 pvid4 pvname=%s not found during beginJob" % src0_pvid_4['pvname'])
+            self.assertTrue(pv1 is not None, msg="xtc: src1 pvid4 pvname=%s not found during beginJob" % src1_pvid_4['pvname'])
+            # right value in beginJob?
+            self.assertEqual(pv0.value(0), src0_pvid_4['beginJobValue'],msg="xtc: src0 pvid4 pvname=%s beginJob value wrong" % src0_pvid_4['pvname'])
+            self.assertEqual(pv1.value(0), src1_pvid_4['beginJobValue'],msg="xtc: src1 pvid4 pvname=%s beginJob value wrong" % src1_pvid_4['pvname'])
+            # are aliases there?
+            alias0 = estore.getPV(src0_pvid_4['alias'])
+            alias1 = estore.getPV(src1_pvid_4['alias'])
+            self.assertTrue(alias0 is not None, msg="xtc: src0 pvid4 alias=%s not found during beginJob" % src0_pvid_4['alias'])
+            self.assertTrue(alias1 is not None, msg="xtc: src1 pvid4 alias=%s not found during beginJob" % src1_pvid_4['alias'])
+            # do aliases have right value?
+            self.assertEqual(alias0.value(0), src0_pvid_4['beginJobValue'],msg="xtc: src0 pvid4 pvname=%s beginJob value wrong from alias=%s" % (src0_pvid_4['pvname'], src0_pvid_4['alias']))
+            self.assertEqual(alias1.value(0), src1_pvid_4['beginJobValue'],msg="xtc: src1 pvid4 pvname=%s beginJob value wrong from alias=%s" % (src1_pvid_4['pvname'], src1_pvid_4['alias']))
+            # check expected number of aliases and pvNames, have not verified that they are all correct, 199 and 227
+            # are what was observed when test was written
+            self.assertEqual(len(estore.aliases()), 199, msg="xtc: estore does not have expected number of aliases")
+            self.assertEqual(len(estore.pvNames()), 227, msg="xtc: estore does not have expected number of pvNames")
+            checkAliases(self, aliases, estore, "xtc configure")
+            # go to the next event
+            dsXtc.events().next()
+            pv0 = estore.getPV(src0_pvid_4['pvname'])
+            pv1 = estore.getPV(src1_pvid_4['pvname'])
+            self.assertTrue(pv0 is not None, msg="xtc: src0 pvid4 pvname=%s not found during event 0" % src0_pvid_4['pvname'])
+            self.assertTrue(pv1 is not None, msg="xtc: src1 pvid4 pvname=%s not found during event 0" % src1_pvid_4['pvname'])
+            self.assertEqual(pv0.value(0), src0_pvid_4['event0value'],msg="xtc: src0 pvid4 pvname=%s event0 value wrong" % src0_pvid_4['pvname'])
+            self.assertEqual(pv1.value(0), src1_pvid_4['event0value'],msg="xtc: src1 pvid4 pvname=%s event0 value wrong" % src1_pvid_4['pvname'])
+            self.assertEqual(pv0.stamp().sec(), src0_pvid_4['event0stamp'][0],msg="xtc: src0 pvid4 pvname=%s event0 stamp sec wrong" % src0_pvid_4['pvname'])
+            self.assertEqual(pv1.stamp().sec(), src1_pvid_4['event0stamp'][0],msg="xtc: src1 pvid4 pvname=%s event0 stamp sec wrong" % src1_pvid_4['pvname'])
+            self.assertEqual(pv0.stamp().nsec(), src0_pvid_4['event0stamp'][1],msg="xtc: src0 pvid4 pvname=%s event0 stamp sec wrong" % src0_pvid_4['pvname'])
+            self.assertEqual(pv1.stamp().nsec(), src1_pvid_4['event0stamp'][1],msg="xtc: src1 pvid4 pvname=%s event0 stamp sec wrong" % src1_pvid_4['pvname'])
+            alias0 = estore.getPV(src0_pvid_4['alias'])
+            alias1 = estore.getPV(src1_pvid_4['alias'])
+            checkAliases(self, aliases, estore, "configure")
+            self.assertTrue(alias0 is not None, msg="xtc: src0 pvid4 alias=%s not found during event0" % src0_pvid_4['alias'])
+            self.assertTrue(alias1 is not None, msg="xtc: src1 pvid4 alias=%s not found during event0" % src1_pvid_4['alias'])
+            self.assertEqual(alias0.value(0), src0_pvid_4['event0value'],msg="xtc: src0 pvid4 pvname=%s beginJob value wrong from alias=%s" % (src0_pvid_4['pvname'], src0_pvid_4['alias']))
+            self.assertEqual(alias1.value(0), src1_pvid_4['event0value'],msg="xtc: src1 pvid4 pvname=%s beginJob value wrong from alias=%s" % (src1_pvid_4['pvname'], src1_pvid_4['alias']))
+            del alias1
+            del alias0
+            del pv1
+            del pv0
+            del estore
+            del dsXtc
 
-        if self.cleanUp: os.unlink(h5_outfile)
+            psana.setConfigFile('')
+            dsH5 = psana.DataSource(h5_outfile) 
+            estore = dsH5.env().epicsStore()
+            # check expected number of aliases and pvNames, have not verified that they are all correct, 193 and 227
+            # are what was observed when test was written
+            self.assertEqual(len(estore.aliases()), 193, msg="h5: estore does not have expected number of aliases")
+            self.assertEqual(len(estore.pvNames()), 227, msg="h5: estore does not have expected number of pvNames")
+            checkAliases(self, aliases, estore, "h5 configure")
+            # are pv's there with right value?
+            pv0 = estore.getPV(src0_pvid_4['pvname'])
+            pv1 = estore.getPV(src1_pvid_4['pvname'])
+            self.assertTrue(pv0 is not None, msg="h5: src0 pvid4 pvname=%s not found during beginJob" % src0_pvid_4['pvname'])
+            self.assertTrue(pv1 is not None, msg="h5: src1 pvid4 pvname=%s not found during beginJob" % src1_pvid_4['pvname'])
+            self.assertEqual(pv0.value(0), src0_pvid_4['beginJobValue'],msg="h5: src0 pvid4 pvname=%s beginJob value wrong" % src0_pvid_4['pvname'])
+            self.assertEqual(pv1.value(0), src1_pvid_4['beginJobValue'],msg="h5: src1 pvid4 pvname=%s beginJob value wrong" % src1_pvid_4['pvname'])
+            alias0 = estore.getPV(src0_pvid_4['alias'])
+            alias1 = estore.getPV(src1_pvid_4['alias'])
+            # these aliases share the same pvid, due to limitation in psana-translate, there should only be one of them
+            self.assertTrue((alias0 is None) or (alias1 is None), msg="h5: one of the src0 pvid4 and scr1 pvid4 aliases is not none")
+            self.assertFalse((alias0 is None) and (alias1 is None), msg="h5: both the scr0 pvid4 and src1 pvid4 aliases are none")
+            # go to the next event
+            dsH5.events().next()
+            pv0 = estore.getPV(src0_pvid_4['pvname'])
+            pv1 = estore.getPV(src1_pvid_4['pvname'])
+            self.assertTrue(pv0 is not None, msg="src0 pvid4 pvname=%s not found during event 0" % src0_pvid_4['pvname'])
+            self.assertTrue(pv1 is not None, msg="src1 pvid4 pvname=%s not found during event 0" % src1_pvid_4['pvname'])
+            self.assertEqual(pv0.value(0), src0_pvid_4['event0value'],msg="src0 pvid4 pvname=%s event0 value wrong" % src0_pvid_4['pvname'])
+            self.assertEqual(pv1.value(0), src1_pvid_4['event0value'],msg="src1 pvid4 pvname=%s event0 value wrong" % src1_pvid_4['pvname'])
+            self.assertEqual(pv0.stamp().sec(), src0_pvid_4['event0stamp'][0],msg="src0 pvid4 pvname=%s event0 stamp sec wrong" % src0_pvid_4['pvname'])
+            self.assertEqual(pv1.stamp().sec(), src1_pvid_4['event0stamp'][0],msg="src1 pvid4 pvname=%s event0 stamp sec wrong" % src1_pvid_4['pvname'])
+            self.assertEqual(pv0.stamp().nsec(), src0_pvid_4['event0stamp'][1],msg="src0 pvid4 pvname=%s event0 stamp sec wrong" % src0_pvid_4['pvname'])
+            self.assertEqual(pv1.stamp().nsec(), src1_pvid_4['event0stamp'][1],msg="src1 pvid4 pvname=%s event0 stamp sec wrong" % src1_pvid_4['pvname'])
+
+            if self.cleanUp: os.unlink(h5_outfile)
 
 
     def test_s80merge(self):
@@ -466,6 +460,7 @@ class Psana( unittest.TestCase ) :
             self.assertTrue((calibNumber,eventNumber) in [(0,16), (1,8)], 
                             msg="should be 16 events in calib 0, and 8 in calib 1")
 
+    @unittest.skip("psana multi process parallel mode is not used anymore, resource heavy test")
     def test_mp(self):
         '''parallel child process mode
         
@@ -484,33 +479,34 @@ class Psana( unittest.TestCase ) :
         dataSourceDir = os.path.join(ptl.getMultiFileDataDir(), 'test_004_xppa1714')
 
        # test that mp mode gives us what we saw before on DAQ only streams
-        dumpOutput = os.path.join(OUTDIR,'unittest_test_mp_mpmode.dump')
-        cmd = '''psana -c '' -p 1'''
-        cmd += ' -o psana_test.dump.output_file=%s' % dumpOutput
-        cmd += (''' -m psana_test.dump exp=xppa1714:run=157:stream=0-20:dir=%s''' % dataSourceDir)
-        o,e = ptl.cmdTimeOut(cmd,100)
-        dumpOutput += '.subproc_0'
-        md5 = ptl.get_md5sum(dumpOutput)
-        prev_md5 = 'fbd1b3a999adb4cdef882c7aceb356dd'
-        failMsg  = 'prev md5=%s\n' % prev_md5
-        failMsg += 'curr md5=%s\n' % md5
-        failMsg += 'are not equal. cmd:\n'
-        failMsg += cmd
-        self.assertEqual(prev_md5, md5, msg=failMsg)
-        os.unlink(dumpOutput)
+        with outputDir('psutst') as outdir:
+            dumpOutput = outdir.fullpath('unittest_test_mp_mpmode.dump')
+            cmd = '''psana -c '' -p 1'''
+            cmd += ' -o psana_test.dump.output_file=%s' % dumpOutput
+            cmd += (''' -m psana_test.dump exp=xppa1714:run=157:stream=0-20:dir=%s''' % dataSourceDir)
+            o,e = ptl.cmdTimeOut(cmd,100)
+            dumpOutput += '.subproc_0'
+            md5 = ptl.get_md5sum(dumpOutput)
+            prev_md5 = 'fbd1b3a999adb4cdef882c7aceb356dd'
+            failMsg  = 'prev md5=%s\n' % prev_md5
+            failMsg += 'curr md5=%s\n' % md5
+            failMsg += 'are not equal. cmd:\n'
+            failMsg += cmd
+            self.assertEqual(prev_md5, md5, msg=failMsg)
+            os.unlink(dumpOutput)
         
-        # test that mp mode is the same as not mp mode (DAQ only streams)
-        dumpOutput = os.path.join(OUTDIR,'unittest_test_mp_normal.dump')
-        cmd = '''psana -c '' -o psana_test.dump.output_file=%s''' % dumpOutput
-        cmd += (''' -m psana_test.dump exp=xppa1714:run=157:stream=0-20:dir=%s''' % dataSourceDir)
-        o,e = ptl.cmdTimeOut(cmd,100)
-        md5 = ptl.get_md5sum(dumpOutput)
-        failMsg  = 'prev md5=%s\n' % prev_md5
-        failMsg += 'curr md5=%s\n' % md5
-        failMsg += 'are not equal. cmd:\n'
-        failMsg += cmd
-        self.assertEqual(prev_md5, md5, msg=failMsg)
-        os.unlink(dumpOutput)
+            # test that mp mode is the same as not mp mode (DAQ only streams)
+            dumpOutput = outdir.fullpath('unittest_test_mp_normal.dump')
+            cmd = '''psana -c '' -o psana_test.dump.output_file=%s''' % dumpOutput
+            cmd += (''' -m psana_test.dump exp=xppa1714:run=157:stream=0-20:dir=%s''' % dataSourceDir)
+            o,e = ptl.cmdTimeOut(cmd,100)
+            md5 = ptl.get_md5sum(dumpOutput)
+            failMsg  = 'prev md5=%s\n' % prev_md5
+            failMsg += 'curr md5=%s\n' % md5
+            failMsg += 'are not equal. cmd:\n'
+            failMsg += cmd
+            self.assertEqual(prev_md5, md5, msg=failMsg)
+            os.unlink(dumpOutput)
 
     def test_jmpToThird(self):
         '''tests the special options to set offset for the third event

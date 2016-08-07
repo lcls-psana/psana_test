@@ -18,6 +18,7 @@ import signal
 import time
 import ctypes
 import xml.etree.ElementTree as ET
+from psana_test.TestOutputDir import outputDir
 
 # ana release packages
 from AppUtils.AppDataPath import AppDataPath
@@ -126,36 +127,6 @@ def expandSitRoot():
     sit_root = os.path.expandvars(sit_root_envvar)
     assert sit_root != sit_root_envvar, "%s not expanded. run sit_setup" % sit_root_envvar
     return sit_root
-
-def expandSitArch():
-    sit_arch_envvar = '$SIT_ARCH'
-    sit_arch = os.path.expandvars(sit_arch_envvar)
-    assert sit_arch != sit_arch_envvar, "%s not expanded. run sit_setup" % sit_arch_envvar
-    return sit_arch
-
-def getDataArchDir(pkg, datasubdir, archsubdir=''):
-    assert len(pkg)>0
-    assert len(datasubdir)>0
-
-    def makeIfDoesntExist(dirpath):
-        if not os.path.exists(dirpath):
-            try:
-                os.mkdir(dirpath)
-            except OSError:
-                pass
-            assert os.path.exists(dirpath), "failed to make directory: %s" % dirpath
-
-    dataPkgDir  = AppDataPath(pkg).path()
-    assert os.path.exists(dataPkgDir), "package directory: %s doesn't exist" % dataPkgDir
-    subDir = os.path.join(dataPkgDir, datasubdir)
-    makeIfDoesntExist(subDir)
-    sit_arch = expandSitArch()
-    finalDir = os.path.join(subDir, sit_arch)
-    makeIfDoesntExist(finalDir)
-    if len(archsubdir) > 0:
-        finalDir = os.path.join(finalDir, archsubdir)
-        makeIfDoesntExist(finalDir)
-    return finalDir
 
 def instrDataDir():
     return '/reg/d/psdm'
@@ -570,76 +541,77 @@ def previousDumpFile(deleteDump=True, doall=False):
     print "   (dump a few events for some xtc, without epics aliases in dump, and no epics pvId's in dump)"
     testFiles = getTestFiles()
     multiTests = getMultiDatasets()
-    dumpOutputDir = getDataArchDir(pkg='psana_test', datasubdir='test_output', archsubdir='prev_xtc_dump')
-    for src,srcDict in zip(['xtc','multi'],[testFiles, multiTests]):
-        for testNumber, info in srcDict.iteritems():
-            if (src == 'xtc') and (testNumber in prevXtc): continue
-            if (src == 'multi') and (testNumber in prevMulti): continue
-            t0 = time.time()
-            xtc_md5s = {}
-            if src == 'xtc':
-                inputDatasource = info['path']
-                xtc_md5s[info['basename'] ] = get_md5sum(inputDatasource)
-                dumpOutput = os.path.join(dumpOutputDir, 'xtc_' + info['basename'] + '.dump')
-                regressOutput = os.path.join(dumpOutputDir, 'regress_xtc_' + info['basename'] + '.dump')
-            elif src == 'multi':
-                inputDatasource = info['dspec']
-                for xtc in info['xtcs']:
-                    xtc_md5s[xtc] = get_md5sum(os.path.join(info['basepath'], xtc))
-                dumpOutput = os.path.join(dumpOutputDir, 'multi_' + info['basedir'] + '.dump')
-                regressOutput = os.path.join(dumpOutputDir, 'regress_multi_' + info['basedir'] + '.dump')
-            cmd, err = psanaDump(inputDatasource, dumpOutput, dumpEpicsAliases=True, regressDump=False)
-            if len(err)>0:
-                fout.close()
-                errMsg = '** FAILURE ** createPrevious: psana_test.dump produced errors on test %d\n' % testNumber
-                errMsg += 'cmd: %s\n' % cmd
-                errMsg += err
-                raise Exception(errMsg)
-            dump_md5 = get_md5sum(dumpOutput)
-            if deleteDump: os.unlink(dumpOutput)
-            regress_md5 = '0' * 32
-            if testNumber in regressTests[src]:
-                testInfo = regressTests[src][testNumber]
-                regressInput, events, dumpEpicsAliases = testInfo['datasource'], testInfo['events'], \
-                                                       testInfo['dumpEpicsAliases']
+    with outputDir('pstst') as outDir:
+        dumpOutputDir = outDir.make_subdir('prev_xtc_dump')
+        for src,srcDict in zip(['xtc','multi'],[testFiles, multiTests]):
+            for testNumber, info in srcDict.iteritems():
+                if (src == 'xtc') and (testNumber in prevXtc): continue
+                if (src == 'multi') and (testNumber in prevMulti): continue
+                t0 = time.time()
+                xtc_md5s = {}
                 if src == 'xtc':
-                    assert regressInput == inputDatasource, "xtc file regression test %d xtc != testData xtc, regress=%s testData=%s" % \
-                        (testNumber, regressInput, inputDatasource)
+                    inputDatasource = info['path']
+                    xtc_md5s[info['basename'] ] = get_md5sum(inputDatasource)
+                    dumpOutput = os.path.join(dumpOutputDir, 'xtc_' + info['basename'] + '.dump')
+                    regressOutput = os.path.join(dumpOutputDir, 'regress_xtc_' + info['basename'] + '.dump')
                 elif src == 'multi':
-                    # see if there is a dir= on the datasource and that it matches the testinfo
-                    # datasource
-                    assert len(inputDatasource.split('dir='))==2, "There is no dir= on the testData"
-                    inputDir = inputDatasource.split('dir=')[1]
-                    failMsg = "regress multi test %d - regress datasource != testData dir\n" % testNumber
-                    failMsg += "regress specifies: %s\n searching test data found: %s" % \
-                               ( testInfo['datasource'], inputDir)
-                    assert inputDir == testInfo['datasource'], failMsg
-
-                cmd, err = psanaDump(inputDatasource, regressOutput, events, dumpEpicsAliases=dumpEpicsAliases, 
-                                     regressDump=True)
+                    inputDatasource = info['dspec']
+                    for xtc in info['xtcs']:
+                        xtc_md5s[xtc] = get_md5sum(os.path.join(info['basepath'], xtc))
+                    dumpOutput = os.path.join(dumpOutputDir, 'multi_' + info['basedir'] + '.dump')
+                    regressOutput = os.path.join(dumpOutputDir, 'regress_multi_' + info['basedir'] + '.dump')
+                cmd, err = psanaDump(inputDatasource, dumpOutput, dumpEpicsAliases=True, regressDump=False)
                 if len(err)>0:
                     fout.close()
-                    errMsg = '** FAILURE ** createPrevious: psana_test.dump produced errors on regress test %d\n' % testNumber
+                    errMsg = '** FAILURE ** createPrevious: psana_test.dump produced errors on test %d\n' % testNumber
                     errMsg += 'cmd: %s\n' % cmd
                     errMsg += err
                     raise Exception(errMsg)
-                regress_md5 = get_md5sum(regressOutput)
-                if deleteDump: os.unlink(regressOutput)
-            if src == 'xtc':
-                fout.write("xtc_md5sum=%s   dump_md5sum=%s   regress_md5sum=%s   xtc=%s\n" % \
-                           (xtc_md5s.values()[0], dump_md5, regress_md5, info['basename']))
-            elif src == 'multi':
-                fout.write("xtc_md5sum=%s   dump_md5sum=%s   regress_md5sum=%s   multi=%s" % \
-                           ('0' * 32, dump_md5, regress_md5, info['basedir']))
-                xtcs = xtc_md5s.keys()
-                xtcs.sort()
-                for xtc in xtcs:
-                    md5 = xtc_md5s[xtc]
-                    fout.write(" %s_md5sum=%s" % (xtc, md5))
-                fout.write('\n')
-            fout.flush()
-            testTimes[src][testNumber] = time.time()-t0
-            print "** prev:  %s test=%3d time=%.2f seconds" % (src, testNumber, testTimes[src][testNumber])
+                dump_md5 = get_md5sum(dumpOutput)
+                if deleteDump: os.unlink(dumpOutput)
+                regress_md5 = '0' * 32
+                if testNumber in regressTests[src]:
+                    testInfo = regressTests[src][testNumber]
+                    regressInput, events, dumpEpicsAliases = testInfo['datasource'], testInfo['events'], \
+                                                           testInfo['dumpEpicsAliases']
+                    if src == 'xtc':
+                        assert regressInput == inputDatasource, "xtc file regression test %d xtc != testData xtc, regress=%s testData=%s" % \
+                            (testNumber, regressInput, inputDatasource)
+                    elif src == 'multi':
+                        # see if there is a dir= on the datasource and that it matches the testinfo
+                        # datasource
+                        assert len(inputDatasource.split('dir='))==2, "There is no dir= on the testData"
+                        inputDir = inputDatasource.split('dir=')[1]
+                        failMsg = "regress multi test %d - regress datasource != testData dir\n" % testNumber
+                        failMsg += "regress specifies: %s\n searching test data found: %s" % \
+                                   ( testInfo['datasource'], inputDir)
+                        assert inputDir == testInfo['datasource'], failMsg
+
+                    cmd, err = psanaDump(inputDatasource, regressOutput, events, dumpEpicsAliases=dumpEpicsAliases, 
+                                         regressDump=True)
+                    if len(err)>0:
+                        fout.close()
+                        errMsg = '** FAILURE ** createPrevious: psana_test.dump produced errors on regress test %d\n' % testNumber
+                        errMsg += 'cmd: %s\n' % cmd
+                        errMsg += err
+                        raise Exception(errMsg)
+                    regress_md5 = get_md5sum(regressOutput)
+                    if deleteDump: os.unlink(regressOutput)
+                if src == 'xtc':
+                    fout.write("xtc_md5sum=%s   dump_md5sum=%s   regress_md5sum=%s   xtc=%s\n" % \
+                               (xtc_md5s.values()[0], dump_md5, regress_md5, info['basename']))
+                elif src == 'multi':
+                    fout.write("xtc_md5sum=%s   dump_md5sum=%s   regress_md5sum=%s   multi=%s" % \
+                               ('0' * 32, dump_md5, regress_md5, info['basedir']))
+                    xtcs = xtc_md5s.keys()
+                    xtcs.sort()
+                    for xtc in xtcs:
+                        md5 = xtc_md5s[xtc]
+                        fout.write(" %s_md5sum=%s" % (xtc, md5))
+                    fout.write('\n')
+                fout.flush()
+                testTimes[src][testNumber] = time.time()-t0
+                print "** prev:  %s test=%3d time=%.2f seconds" % (src, testNumber, testTimes[src][testNumber])
     fout.close()
     testsTime = sum(testTimes['xtc'].values())+sum(testTimes['multi'].values())
     print "* tests time: %.2f sec, or %.2f min" % (testsTime,testsTime/60.0)
@@ -850,74 +822,75 @@ def testShmCommand(args):
     xtcservercmd += ' -r %d' % ratePerSecond
     numberOfClients = 1
     xtcservercmd += ' -c %d' % numberOfClients
-    OUTDIR = getDataArchDir(pkg='psana_test', datasubdir='test_output')
-    xtcserverCmdStdout = os.path.join(OUTDIR,'testShm.xtcserver.stdout')
-    xtcserverCmdStderr = os.path.join(OUTDIR,'testShm.xtcserver.stderr')
-    dataSource = 'shmem=%s.0' % shmemName
-    dumpcmd = 'psana -m psana_test.dump %s' % dataSource
-    print "about to launch commands:"
-    print xtcservercmd
-    print dumpcmd
-    expectedSharedMemoryFile = "/dev/shm/PdsMonitorSharedMemory_%s" % shmemName
-    if os.path.exists(expectedSharedMemoryFile):
-        print "ERROR: shared memory file exists: %s" % expectedSharedMemoryFile
-        print " delete (if safe) and rerun test"
-        return
-    outputFiles = [xtcserverCmdStderr, xtcserverCmdStdout]
-    for outputFile in outputFiles:
-        if os.path.exists(outputFile):
-            print "warning: test output file exists. deleting: %s" % outputFile
-            os.unlink(outputFile)
-        
-    xtcservercmd += ' > %s 2>%s &' % (xtcserverCmdStdout, xtcserverCmdStderr)
-    # run server in background while running dumpcmd
-    print "running server cmd in bkgnd"
-    try:
-        os.system(xtcservercmd)
-    except Exception,e:
-        print "ERROR running server command."
+    with outputDir(prefix='pstst') as outDir:
+        OUTDIR = outDir.root()
+        xtcserverCmdStdout = os.path.join(OUTDIR,'testShm.xtcserver.stdout')
+        xtcserverCmdStderr = os.path.join(OUTDIR,'testShm.xtcserver.stderr')
+        dataSource = 'shmem=%s.0' % shmemName
+        dumpcmd = 'psana -m psana_test.dump %s' % dataSource
+        print "about to launch commands:"
+        print xtcservercmd
+        print dumpcmd
+        expectedSharedMemoryFile = "/dev/shm/PdsMonitorSharedMemory_%s" % shmemName
         if os.path.exists(expectedSharedMemoryFile):
-            print "deleteing shared memory server file: %s" % expectedSharedMemoryFile
-            os.unlink(expectedSharedMemoryFile)
-        raise e
-    time.sleep(.35) # sleep a little in case the server needs time to start up    
-    print "running dump cmd"
-    try:
-        dumpStdout,dumpError = cmdTimeOut(dumpcmd,30)
-    except Alarm, alarm:
-        print "ERROR: psana_test.dump command timed out: %s" % alarm
-        print "  run ps and clean up jobs"
-        print "  try to run test again, or try to increase the message size "
-        print "  from 10 to 32 before running this test with the command: "
-        print "  sudo /sbin/sysctl -w fs.mqueue.msg_max=32"
-        print "===== xtcserver cmd stderr ======="
-        print file(xtcserverCmdStderr).read()
-        print "===== xtcserver cmd stdout ======"
-        print file(xtcserverCmdStdout).read()
-        if os.path.exists(expectedSharedMemoryFile):
-            print "deleteing shared memory server file: %s" % expectedSharedMemoryFile
-            os.unlink(expectedSharedMemoryFile)
-        raise alarm
+            print "ERROR: shared memory file exists: %s" % expectedSharedMemoryFile
+            print " delete (if safe) and rerun test"
+            return
+        outputFiles = [xtcserverCmdStderr, xtcserverCmdStdout]
+        for outputFile in outputFiles:
+            if os.path.exists(outputFile):
+                print "warning: test output file exists. deleting: %s" % outputFile
+                os.unlink(outputFile)
 
-    # check dump outout
-    print "===== dump stderr ====="
-    print dumpError
-    print "===== test result ====="
-    typeLines = set()
-    for ln in dumpStdout.split('\n'):
-        if ln.startswith('type='):
-            typeLines.add(ln.strip())
-    missingTypeLines = testShmDumpTypes.difference(typeLines)
-    if len(missingTypeLines)>0:
-        print "ERROR: dump output does not list the following types: %r"  % missingTypeLines
-    else:
-        print "SUCCESS! shmem test passed. dump against shared memory appears to have produced expected output"
-    
-    time.sleep(.5)  # sleep a bit in case the server is not finished
-    toDelete = [expectedSharedMemoryFile] + outputFiles    
-    for fname in toDelete:
-        if os.path.exists(fname):
-            os.unlink(fname)
+        xtcservercmd += ' > %s 2>%s &' % (xtcserverCmdStdout, xtcserverCmdStderr)
+        # run server in background while running dumpcmd
+        print "running server cmd in bkgnd"
+        try:
+            os.system(xtcservercmd)
+        except Exception,e:
+            print "ERROR running server command."
+            if os.path.exists(expectedSharedMemoryFile):
+                print "deleteing shared memory server file: %s" % expectedSharedMemoryFile
+                os.unlink(expectedSharedMemoryFile)
+            raise e
+        time.sleep(.35) # sleep a little in case the server needs time to start up    
+        print "running dump cmd"
+        try:
+            dumpStdout,dumpError = cmdTimeOut(dumpcmd,30)
+        except Alarm, alarm:
+            print "ERROR: psana_test.dump command timed out: %s" % alarm
+            print "  run ps and clean up jobs"
+            print "  try to run test again, or try to increase the message size "
+            print "  from 10 to 32 before running this test with the command: "
+            print "  sudo /sbin/sysctl -w fs.mqueue.msg_max=32"
+            print "===== xtcserver cmd stderr ======="
+            print file(xtcserverCmdStderr).read()
+            print "===== xtcserver cmd stdout ======"
+            print file(xtcserverCmdStdout).read()
+            if os.path.exists(expectedSharedMemoryFile):
+                print "deleteing shared memory server file: %s" % expectedSharedMemoryFile
+                os.unlink(expectedSharedMemoryFile)
+            raise alarm
+
+        # check dump outout
+        print "===== dump stderr ====="
+        print dumpError
+        print "===== test result ====="
+        typeLines = set()
+        for ln in dumpStdout.split('\n'):
+            if ln.startswith('type='):
+                typeLines.add(ln.strip())
+        missingTypeLines = testShmDumpTypes.difference(typeLines)
+        if len(missingTypeLines)>0:
+            print "ERROR: dump output does not list the following types: %r"  % missingTypeLines
+        else:
+            print "SUCCESS! shmem test passed. dump against shared memory appears to have produced expected output"
+
+        time.sleep(.5)  # sleep a bit in case the server is not finished
+        toDelete = [expectedSharedMemoryFile] + outputFiles    
+        for fname in toDelete:
+            if os.path.exists(fname):
+                os.unlink(fname)
 
 def translate(inDataset, outfile, numEvents, testLabel, verbose):
     numEventsStr = ''
@@ -1022,142 +995,143 @@ def testCommand(args):
     assert delete.lower() in ['','false','true']
     assert verbose.lower() in ['','false','true']        
 
-    dumpOutputDir = getDataArchDir(pkg='psana_test', datasubdir='test_output', archsubdir='current_xtc_dump')
-    h5dir = getDataArchDir(pkg='psana_test', datasubdir='test_output', archsubdir='current_h5')
-    h5dumpDir = getDataArchDir(pkg='psana_test', datasubdir='test_output', archsubdir='current_h5_dump')
-    delete = not (delete.lower() == 'false')
-    verbose = (verbose.lower() == 'true')
-    xtcTestFiles = getTestFiles(noTranslator=True)
-    multiTestSets = getMultiDatasets()
-    testFiles = {'xtc':xtcTestFiles, 'multi':multiTestSets}
-    prev = {'xtc':None, 'multi':None}
-    prev['xtc'], prev['multi'] = readPrevious()
-    regress = readRegressionTestFile()
-    whichTest = 'regress'
-    testNumberFilter = {'xtc':regress['xtc'].keys(), 'multi':regress['multi'].keys()}
-    expectedDiffs = getRegressionTestExpectedDifferences()
-    srcs = ['xtc','multi']
-    if testSet.startswith('xtc:'):
-        srcs = ['xtc']
-        testSet = testSet.split('xtc:')[1]
-    elif testSet.startswith('multi:'):
-        srcs = ['multi']
-        testSet = testSet.split('multi:')[1]
-    if testSet.startswith('full'):
-        whichTest = 'full'
-        expectedDiffs = getFullTestExpectedDifferences()
-        jnk, afterFull = testSet.split('full')
-        if len(afterFull)>0:
-            assert afterFull.startswith(':'), "must follow full with : to specify tests, not '%s' " % afterFull
-            jnk, testSet = afterFull.split(':')
-        else:
-            testSet = ''
-    if testSet != '':
-        commaSepTestSet = testSet.split(',')
-        testNumberFilter['xtc'] = []
-        testNumberFilter['multi'] = []
-        for val in commaSepTestSet:
-            if val.find('-')>0:
-                a,b = map(int,val.split('-'))
-                for src in srcs:
-                    testNumberFilter[src].extend(range(a,b+1))
+    with outputDir(prefix='pstst') as outDir:
+        dumpOutputDir = outDir.make_subdir('current_xtc_dump')
+        h5dir = outDir.make_subdir('current_h5')
+        h5dumpDir = outDir.make_subdir('current_h5_dump')
+        delete = not (delete.lower() == 'false')
+        verbose = (verbose.lower() == 'true')
+        xtcTestFiles = getTestFiles(noTranslator=True)
+        multiTestSets = getMultiDatasets()
+        testFiles = {'xtc':xtcTestFiles, 'multi':multiTestSets}
+        prev = {'xtc':None, 'multi':None}
+        prev['xtc'], prev['multi'] = readPrevious()
+        regress = readRegressionTestFile()
+        whichTest = 'regress'
+        testNumberFilter = {'xtc':regress['xtc'].keys(), 'multi':regress['multi'].keys()}
+        expectedDiffs = getRegressionTestExpectedDifferences()
+        srcs = ['xtc','multi']
+        if testSet.startswith('xtc:'):
+            srcs = ['xtc']
+            testSet = testSet.split('xtc:')[1]
+        elif testSet.startswith('multi:'):
+            srcs = ['multi']
+            testSet = testSet.split('multi:')[1]
+        if testSet.startswith('full'):
+            whichTest = 'full'
+            expectedDiffs = getFullTestExpectedDifferences()
+            jnk, afterFull = testSet.split('full')
+            if len(afterFull)>0:
+                assert afterFull.startswith(':'), "must follow full with : to specify tests, not '%s' " % afterFull
+                jnk, testSet = afterFull.split(':')
             else:
-                for src in srcs:
-                    testNumberFilter[src].append(int(val))
+                testSet = ''
+        if testSet != '':
+            commaSepTestSet = testSet.split(',')
+            testNumberFilter['xtc'] = []
+            testNumberFilter['multi'] = []
+            for val in commaSepTestSet:
+                if val.find('-')>0:
+                    a,b = map(int,val.split('-'))
+                    for src in srcs:
+                        testNumberFilter[src].extend(range(a,b+1))
+                else:
+                    for src in srcs:
+                        testNumberFilter[src].append(int(val))
 
-    for src in srcs:
-        for num in testNumberFilter[src]:
-            if num in testFiles[src]:
-                # for full, make sure every test number has a previous entry.
-                # for regress, its ok to specify numbers that aren't in the regression set,
-                # but if they are, make sure there is a previous entry
-                if (whichTest == 'full') or (whichTest == 'regress' and num in regress[src]):
-                    assert num in prev[src], "There is a new %s test number: %s\n. Run prev command first." % (src,num)
+        for src in srcs:
+            for num in testNumberFilter[src]:
+                if num in testFiles[src]:
+                    # for full, make sure every test number has a previous entry.
+                    # for regress, its ok to specify numbers that aren't in the regression set,
+                    # but if they are, make sure there is a previous entry
+                    if (whichTest == 'full') or (whichTest == 'regress' and num in regress[src]):
+                        assert num in prev[src], "There is a new %s test number: %s\n. Run prev command first." % (src,num)
 
-    if verbose:
-        print "psanaTestLib - about to run %s tests:" % whichTest
-        xtcTests = testNumberFilter['xtc']
-        multiTests = testNumberFilter['multi']
-        xtcTests.sort()
-        multiTests.sort()
-        if whichTest == 'regress':
-            xtcTests = [x for x in xtcTests if x in regress['xtc']]
-            multiTests = [x for x in multiTests if x in regress['multi']]
-        print "  xtc: %s" % ','.join(map(str,xtcTests))
-        print " multi: %s" % ','.join(map(str,multiTests))
-
-    testTimes = {'xtc':{}, 'multi':{}}
-    for src in srcs:
-        for num in testNumberFilter[src]:
-            if num not in testFiles[src]: continue
-            t0 = time.time()
-            testDataInfo = testFiles[src][num]
-            prevInfo = prev[src][num]
-            checkForSameXtcFiles(testDataInfo, prevInfo, src, num, verbose)            
-            checkForSameMd5sOfXtcFiles(testDataInfo, prevInfo, src, num, verbose)
-            # set parameters passed to psana_test.dump to default, for full test
-            regressStr = ''
-            numEvents = 0
-            dumpEpicsAliases=True
-            regressDump=False
-            md5prev = prev[src][num]['md5dump']
+        if verbose:
+            print "psanaTestLib - about to run %s tests:" % whichTest
+            xtcTests = testNumberFilter['xtc']
+            multiTests = testNumberFilter['multi']
+            xtcTests.sort()
+            multiTests.sort()
             if whichTest == 'regress':
-                if num not in regress[src]:
-                    print "warning: src=%s test=%d not in regress tests, skipping" % (src,num)
-                    continue
-                regressStr = 'regress_'
-                numEvents = regress[src][num]['events']
-                dumpEpicsAliases=False
-                regressDump=True
-                md5prev = prev[src][num]['md5regress']
-            if src == 'xtc':
-                inputDataSource = testDataInfo['path']
-                dumpOutputBase = regressStr + 'xtc_' + testDataInfo['basename']
-                h5OutputBase = regressStr + 'xtc_' + testDataInfo['basename']
-            elif src == 'multi':
-                inputDataSource = testDataInfo['dspec']
-                dumpOutputBase = regressStr + 'multi_' + testDataInfo['basedir']
-                h5OutputBase = regressStr + 'multi_' + testDataInfo['basedir']
-            dumpOutputBase += '.dump'
-            h5OutputBase = os.path.splitext(h5OutputBase)[0] + '.h5'
-            h5OutputDumpBase = h5OutputBase + '.dump'
-            testLabel = "%s%s_test_%3.3d" % (regressStr, src, num)
-            dumpOutputPath = os.path.join(dumpOutputDir, dumpOutputBase)
-            cmd, err = psanaDump(inputDataSource, dumpOutputPath, 
-                                 numEvents, dumpEpicsAliases=dumpEpicsAliases, 
-                                 regressDump=regressDump, verbose=verbose)
-            if len(err) > 0:
-                raise Exception("**Failure: %s, psanaDump call failed.\n cmd=%s\n%s" % (testLabel, cmd, err))
-           
-            md5current = get_md5sum(dumpOutputPath)
-            failMsg = "**FAIL: %s" % testLabel
-            failMsg += " md5 of dump does not agree with previously recorded\n."
-            failMsg += "cmd=%s\n" % cmd
-            failMsg += "prev_md5=%s\n" % md5prev
-            failMsg += "curr_md5=%s" % md5current
-            assert md5prev == md5current, failMsg
+                xtcTests = [x for x in xtcTests if x in regress['xtc']]
+                multiTests = [x for x in multiTests if x in regress['multi']]
+            print "  xtc: %s" % ','.join(map(str,xtcTests))
+            print " multi: %s" % ','.join(map(str,multiTests))
 
-            if verbose: 
-                msg = "%s%s test=%d: success: same md5 for xtc data as previously recorded" 
-                msg %= (regressStr, src, num)
-                print msg
+        testTimes = {'xtc':{}, 'multi':{}}
+        for src in srcs:
+            for num in testNumberFilter[src]:
+                if num not in testFiles[src]: continue
+                t0 = time.time()
+                testDataInfo = testFiles[src][num]
+                prevInfo = prev[src][num]
+                checkForSameXtcFiles(testDataInfo, prevInfo, src, num, verbose)            
+                checkForSameMd5sOfXtcFiles(testDataInfo, prevInfo, src, num, verbose)
+                # set parameters passed to psana_test.dump to default, for full test
+                regressStr = ''
+                numEvents = 0
+                dumpEpicsAliases=True
+                regressDump=False
+                md5prev = prev[src][num]['md5dump']
+                if whichTest == 'regress':
+                    if num not in regress[src]:
+                        print "warning: src=%s test=%d not in regress tests, skipping" % (src,num)
+                        continue
+                    regressStr = 'regress_'
+                    numEvents = regress[src][num]['events']
+                    dumpEpicsAliases=False
+                    regressDump=True
+                    md5prev = prev[src][num]['md5regress']
+                if src == 'xtc':
+                    inputDataSource = testDataInfo['path']
+                    dumpOutputBase = regressStr + 'xtc_' + testDataInfo['basename']
+                    h5OutputBase = regressStr + 'xtc_' + testDataInfo['basename']
+                elif src == 'multi':
+                    inputDataSource = testDataInfo['dspec']
+                    dumpOutputBase = regressStr + 'multi_' + testDataInfo['basedir']
+                    h5OutputBase = regressStr + 'multi_' + testDataInfo['basedir']
+                dumpOutputBase += '.dump'
+                h5OutputBase = os.path.splitext(h5OutputBase)[0] + '.h5'
+                h5OutputDumpBase = h5OutputBase + '.dump'
+                testLabel = "%s%s_test_%3.3d" % (regressStr, src, num)
+                dumpOutputPath = os.path.join(dumpOutputDir, dumpOutputBase)
+                cmd, err = psanaDump(inputDataSource, dumpOutputPath, 
+                                     numEvents, dumpEpicsAliases=dumpEpicsAliases, 
+                                     regressDump=regressDump, verbose=verbose)
+                if len(err) > 0:
+                    raise Exception("**Failure: %s, psanaDump call failed.\n cmd=%s\n%s" % (testLabel, cmd, err))
 
-            h5file = os.path.join(h5dir, h5OutputBase)
-            translate(inputDataSource, h5file, numEvents, testLabel, verbose)
-            h5DumpPath = os.path.join(h5dumpDir, h5OutputDumpBase)
-            cmd, err = psanaDump(h5file, h5DumpPath, numEvents, 
-                                 dumpEpicsAliases=dumpEpicsAliases, regressDump=regressDump, verbose=verbose)
-            if len(err) > 0:
-                raise Exception("**Failure: test=%d, psanaDump failed on h5.\n cmd=%s\n%s" % (num, cmd, err))
-            # skip h5 vs xtc dump compare for full
-            if whichTest == 'regress':
-                xtc2h5ExpectedDiff = expectedDiffs[src].get(num,'')
-                compareXtcH5Dump(dumpOutputPath, h5DumpPath, num, verbose, expectedOutput=xtc2h5ExpectedDiff)
-            if delete:
-                removeFiles([dumpOutputPath, h5DumpPath, h5file])
-            testTime = time.time()-t0
-            testTimes[src][num]=testTime
-            print "%s success: total time: %.2f sec or %.2f min" % (testLabel,testTime,testTime/60.0)
+                md5current = get_md5sum(dumpOutputPath)
+                failMsg = "**FAIL: %s" % testLabel
+                failMsg += " md5 of dump does not agree with previously recorded\n."
+                failMsg += "cmd=%s\n" % cmd
+                failMsg += "prev_md5=%s\n" % md5prev
+                failMsg += "curr_md5=%s" % md5current
+                assert md5prev == md5current, failMsg
+
+                if verbose: 
+                    msg = "%s%s test=%d: success: same md5 for xtc data as previously recorded" 
+                    msg %= (regressStr, src, num)
+                    print msg
+
+                h5file = os.path.join(h5dir, h5OutputBase)
+                translate(inputDataSource, h5file, numEvents, testLabel, verbose)
+                h5DumpPath = os.path.join(h5dumpDir, h5OutputDumpBase)
+                cmd, err = psanaDump(h5file, h5DumpPath, numEvents, 
+                                     dumpEpicsAliases=dumpEpicsAliases, regressDump=regressDump, verbose=verbose)
+                if len(err) > 0:
+                    raise Exception("**Failure: test=%d, psanaDump failed on h5.\n cmd=%s\n%s" % (num, cmd, err))
+                # skip h5 vs xtc dump compare for full
+                if whichTest == 'regress':
+                    xtc2h5ExpectedDiff = expectedDiffs[src].get(num,'')
+                    compareXtcH5Dump(dumpOutputPath, h5DumpPath, num, verbose, expectedOutput=xtc2h5ExpectedDiff)
+                if delete:
+                    removeFiles([dumpOutputPath, h5DumpPath, h5file])
+                testTime = time.time()-t0
+                testTimes[src][num]=testTime
+                print "%s success: total time: %.2f sec or %.2f min" % (testLabel,testTime,testTime/60.0)
 
     totalTestTimes = sum(testTimes['xtc'].values()) + sum(testTimes['multi'].values())
     print "total test times: %.2f sec or %.2f min" % (totalTestTimes, totalTestTimes/60.0)
