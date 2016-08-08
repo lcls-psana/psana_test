@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-51
+2016-8-8 David Schneider
+- let user set environment variable NOCLEAN=1 to keep /tmp dirs for tests
+
 Tag: V00-08-50
 2016-8-6 David Schneider
 - use /tmp for test output

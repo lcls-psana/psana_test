@@ -2,6 +2,10 @@ import sys
 import os
 import shutil
 
+NOCLEAN = os.environ.get('NOCLEAN',False)
+if not NOCLEAN:
+    sys.stdout.write("%s: set environment variable NOCLEAN=1 to keep temporary directories and from unit tests" % __file__)
+
 class TestOutputDir(object):
     def __init__(self, prefix=None):
         self.rm = False
@@ -9,11 +13,9 @@ class TestOutputDir(object):
         self.tmpdir = None
         
     def __enter__(self):
-        self.tmpdir = os.environ.get('PSANA_TEST_OUTDIR', None)
-        if self.tmpdir is None:
-            self.tmpdir = os.tempnam(None, self.prefix)
-            sys.stdout.write("psanaTestLib - generated random dir %s for tests - set environment variable PSANA_TEST_OUTDIR to override\n" % self.tmpdir)
-            self.rm = True
+        global NOCLEAN
+        self.tmpdir = os.tempnam(None, self.prefix)
+        self.rm = not NOCLEAN
         if not os.path.exists(self.tmpdir):
             os.makedirs(self.tmpdir)
         return self
@@ -32,8 +34,6 @@ class TestOutputDir(object):
     def __exit__(self, exType, value, traceback):
         if self.rm:
             shutil.rmtree(self.tmpdir)
-
-
 
 def outputDir(prefix=None):
     return TestOutputDir(prefix)
