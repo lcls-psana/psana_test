@@ -28,7 +28,7 @@ const char * usage = "%s dg|xtc1|xtc xtcfile [--payload=n] [--dgrams=n]\n \
       --dgrams=n     how many dgrams to print\n\
       --sml          parse out the small data proxies instead of printing the payload\n\
       --epics        print extra lines with details on epics, both epicsConfigV1 and the pv's\n\
-      --dgHex        for dg headers, give a hex listing of 40 bytes as 10 uint32's";
+      --dgHex        for dg headers, give a hex listing of 40 bytes as 10 uint32's\n";
 
 void dgramHeaderIterator_nextAndOffset(int fd, long maxDgrams, bool printDgHex);           // dg
 void dgramAndItsXtcIterator(int fd, long maxDgrams, bool xtcDiagnose, bool printDgHex);    // xtc1
@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
   if (argc > 2)  xtcFileName = argv[2];
   if ((NULL == dumpArg) or (xtcFileName=="")) {
     printf(usage,argv[0]);
-    return -1;
+    return 0;
   }
   // check for --payload=n , --dgrams=n, --epics and --sml
   static const char *payload = "--payload=";
