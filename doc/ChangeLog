@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-53
+2016-9-5 David Schneider
+- use AppDataPath to get the test files, allow testing from site-packages in conda env
+
 Tag: V00-08-52
 2016-8-8 David Schneider
 - have xtclinedump -h return 0 instead of -1 so that it can be testable

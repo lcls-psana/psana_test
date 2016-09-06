@@ -230,20 +230,28 @@ def getMultiDatasets():
     return res
 
 def getPreviousDumpFilename():
-    return os.path.join('psana_test', 'data', 'previousDump.txt')
+    dataDir = AppDataPath('psana_test').path()
+    assert os.path.exists(dataDir)
+    return os.path.join(dataDir, 'previousDump.txt')
 
 def getRegressionTestFilename():
-    return os.path.join('psana_test','data','regressionTests.txt')
+    dataDir = AppDataPath('psana_test').path()
+    assert os.path.exists(dataDir)
+    return os.path.join(dataDir,'regressionTests.txt')
 
 def getRegressionTestExpectedDifferencesFilename():
-    return os.path.join('psana_test','data','regressionTestsExpectedDiffs.xml')
+    dataDir = AppDataPath('psana_test').path()
+    assert os.path.exists(dataDir)
+    return os.path.join(dataDir,'regressionTestsExpectedDiffs.xml')
 
 def getRegressionTestExpectedDifferences():
     tree = ET.parse(getRegressionTestExpectedDifferencesFilename())
     return parseXmlTreeForExpectedDiffs(tree)
 
 def getFullTestExpectedDifferencesFilename():
-    return os.path.join('psana_test','data','fullTestsExpectedDiffs.xml')
+    dataDir = AppDataPath('psana_test').path()
+    assert os.path.exists(dataDir)
+    return os.path.join(dataDir,'fullTestsExpectedDiffs.xml')
 
 def getFullTestExpectedDifferences():
     tree = ET.parse(getFullTestExpectedDifferencesFilename())
@@ -261,7 +269,9 @@ def parseXmlTreeForExpectedDiffs(tree):
     return expectedDiffs
     
 def getPreviousXtcDirsFilename():
-    return os.path.join('psana_test', 'data', 'previousXtcDirs.txt')
+    dataDir = AppDataPath('psana_test').path()
+    assert os.path.exists(dataDir)
+    return os.path.join(dataDir, 'previousXtcDirs.txt')
 
 def filterPsanaStderr(ln):
     ''' returns True if this line is nothing to worry about from psana output.
@@ -521,9 +531,6 @@ def previousCommand(args):
     previousDumpFile(deleteDump, doall)
 
 def previousDumpFile(deleteDump=True, doall=False):
-    prevDir = os.path.join('psana_test','data')
-    assert os.path.exists(prevDir), ("Directory %s does not exist. " + \
-                                     "Run from a release directory with psana_test checked out") % prevDir
     prevFullName = getPreviousDumpFilename()
     if doall:
         fout = file(prevFullName,'w')
