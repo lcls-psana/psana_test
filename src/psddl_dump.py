@@ -1316,43 +1316,6 @@ def FCCD_FccdConfigV2_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
-def Generic1D_ConfigV0_to_str(obj, indent, lvl, methodSep):
-    assert obj.TypeId == psana.Generic1D.ConfigV0.TypeId
-    assert obj.Version == psana.Generic1D.ConfigV0.Version
-    methodStrings = []
-    methodStrings.append(Generic1D_Config_data_offset(obj, indent, lvl))
-    methodStrings.append(Generic1D_Config_Depth(obj, indent, lvl))
-    # one_line_methods
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'NChannels: %s' % uint32_to_str( obj.NChannels() )
-    methodStrings.append(methodStr)                                 
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'Length: %s' % ndarray_to_str( obj.Length() )
-    methodStrings.append(methodStr)                                 
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'SampleType: %s' % ndarray_to_str( obj.SampleType() )
-    methodStrings.append(methodStr)                                 
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'Offset: %s' % ndarray_to_str( obj.Offset() )
-    methodStrings.append(methodStr)                                 
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'Period: %s' % ndarray_to_str( obj.Period() )
-    methodStrings.append(methodStr)                                 
-    methodStrings = [meth for meth in methodStrings if len(meth)>0]
-    return methodSep.join(methodStrings)
-
-def Generic1D_DataV0_to_str(obj, indent, lvl, methodSep):
-    assert obj.TypeId == psana.Generic1D.DataV0.TypeId
-    assert obj.Version == psana.Generic1D.DataV0.Version
-    methodStrings = []
-    methodStrings.extend(Generic1D_Data_channel_data(obj, indent, lvl))
-    # one_line_methods
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'data_size: %s' % uint32_to_str( obj.data_size() )
-    methodStrings.append(methodStr)                                 
-    methodStrings = [meth for meth in methodStrings if len(meth)>0]
-    return methodSep.join(methodStrings)
-
 def PNCCD_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.PNCCD.ConfigV1.TypeId
     assert obj.Version == psana.PNCCD.ConfigV1.Version
@@ -1468,6 +1431,43 @@ def PNCCD_FramesV1_to_str(obj, indent, lvl, methodSep):
         if idx+1 < numObjs:
             methodStr += '\n'
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def Generic1D_ConfigV0_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Generic1D.ConfigV0.TypeId
+    assert obj.Version == psana.Generic1D.ConfigV0.Version
+    methodStrings = []
+    methodStrings.append(Generic1D_Config_data_offset(obj, indent, lvl))
+    methodStrings.append(Generic1D_Config_Depth(obj, indent, lvl))
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'NChannels: %s' % uint32_to_str( obj.NChannels() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'Length: %s' % ndarray_to_str( obj.Length() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'SampleType: %s' % ndarray_to_str( obj.SampleType() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'Offset: %s' % ndarray_to_str( obj.Offset() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'Period: %s' % ndarray_to_str( obj.Period() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def Generic1D_DataV0_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Generic1D.DataV0.TypeId
+    assert obj.Version == psana.Generic1D.DataV0.Version
+    methodStrings = []
+    methodStrings.extend(Generic1D_Data_channel_data(obj, indent, lvl))
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data_size: %s' % uint32_to_str( obj.data_size() )
+    methodStrings.append(methodStr)                                 
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
@@ -4902,6 +4902,87 @@ def Ipimb_DataV2_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def UsdUsb_FexConfigV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.UsdUsb.FexConfigV1.TypeId
+    assert obj.Version == psana.UsdUsb.FexConfigV1.Version
+    methodStrings = []
+    methodStrings.append(UsdUsb_FexConfig_name(obj, indent, lvl))
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'offset: %s' % ndarray_to_str( obj.offset() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'scale: %s' % ndarray_to_str( obj.scale() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def UsdUsb_FexDataV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.UsdUsb.FexDataV1.TypeId
+    assert obj.Version == psana.UsdUsb.FexDataV1.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'encoder_values: %s' % ndarray_to_str( obj.encoder_values() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def UsdUsb_ConfigV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.UsdUsb.ConfigV1.TypeId
+    assert obj.Version == psana.UsdUsb.ConfigV1.Version
+    methodStrings = []
+    # idx_list_one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'counting_mode'
+    try:
+       for idx in range( 4 ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % enum_to_str( obj.counting_mode(idx) )
+       methodStrings.append( methodStr )
+    except:
+       for idx, subObj in enumerate( obj.counting_mode() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % enum_to_str( subObj )
+       methodStrings.append( methodStr )
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'quadrature_mode'
+    try:
+       for idx in range( 4 ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % enum_to_str( obj.quadrature_mode(idx) )
+       methodStrings.append( methodStr )
+    except:
+       for idx, subObj in enumerate( obj.quadrature_mode() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % enum_to_str( subObj )
+       methodStrings.append( methodStr )
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def UsdUsb_DataV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.UsdUsb.DataV1.TypeId
+    assert obj.Version == psana.UsdUsb.DataV1.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digital_in: %s' % uint8_to_str( obj.digital_in() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timestamp: %s' % uint32_to_str( obj.timestamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'status: %s' % ndarray_to_str( obj.status() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'analog_in: %s' % ndarray_to_str( obj.analog_in() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'encoder_count: %s' % ndarray_to_str( obj.encoder_count() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def Bld_BldDataFEEGasDetEnergy_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataFEEGasDetEnergy.TypeId
     assert obj.Version == psana.Bld.BldDataFEEGasDetEnergy.Version
@@ -5442,6 +5523,30 @@ def Bld_BldDataPimV1_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def Bld_BldDataUsdUsbV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Bld.BldDataUsdUsbV1.TypeId
+    assert obj.Version == psana.Bld.BldDataUsdUsbV1.Version
+    methodStrings = []
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'config:\n'
+    methodStr += UsdUsb_ConfigV1_to_str(obj.config(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fexConfig:\n'
+    methodStr += UsdUsb_FexConfigV1_to_str(obj.fexConfig(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data:\n'
+    methodStr += UsdUsb_DataV1_to_str(obj.data(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fexData:\n'
+    methodStr += UsdUsb_FexDataV1_to_str(obj.fexData(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def Bld_BldDataGMDV0_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataGMDV0.TypeId
     assert obj.Version == psana.Bld.BldDataGMDV0.Version
@@ -5632,6 +5737,32 @@ def Bld_BldDataAnalogInputV1_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def Bld_BldDataBeamMonitorV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Bld.BldDataBeamMonitorV1.TypeId
+    assert obj.Version == psana.Bld.BldDataBeamMonitorV1.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'TotalIntensity: %s' % double_to_str( obj.TotalIntensity() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'X_Position: %s' % double_to_str( obj.X_Position() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'Y_Position: %s' % double_to_str( obj.Y_Position() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'peakA: %s' % double_to_str( obj.peakA() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'peakT: %s' % double_to_str( obj.peakT() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'Channel_Intensity: %s' % ndarray_to_str( obj.Channel_Intensity() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def Andor3d_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Andor3d.ConfigV1.TypeId
     assert obj.Version == psana.Andor3d.ConfigV1.Version
@@ -5738,87 +5869,6 @@ def Arraychar_DataV1_to_str(obj, indent, lvl, methodSep):
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'data: %s' % ndarray_to_str( obj.data() )
-    methodStrings.append(methodStr)                                 
-    methodStrings = [meth for meth in methodStrings if len(meth)>0]
-    return methodSep.join(methodStrings)
-
-def UsdUsb_FexConfigV1_to_str(obj, indent, lvl, methodSep):
-    assert obj.TypeId == psana.UsdUsb.FexConfigV1.TypeId
-    assert obj.Version == psana.UsdUsb.FexConfigV1.Version
-    methodStrings = []
-    methodStrings.append(UsdUsb_FexConfig_name(obj, indent, lvl))
-    # one_line_methods
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'offset: %s' % ndarray_to_str( obj.offset() )
-    methodStrings.append(methodStr)                                 
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'scale: %s' % ndarray_to_str( obj.scale() )
-    methodStrings.append(methodStr)                                 
-    methodStrings = [meth for meth in methodStrings if len(meth)>0]
-    return methodSep.join(methodStrings)
-
-def UsdUsb_FexDataV1_to_str(obj, indent, lvl, methodSep):
-    assert obj.TypeId == psana.UsdUsb.FexDataV1.TypeId
-    assert obj.Version == psana.UsdUsb.FexDataV1.Version
-    methodStrings = []
-    # one_line_methods
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'encoder_values: %s' % ndarray_to_str( obj.encoder_values() )
-    methodStrings.append(methodStr)                                 
-    methodStrings = [meth for meth in methodStrings if len(meth)>0]
-    return methodSep.join(methodStrings)
-
-def UsdUsb_ConfigV1_to_str(obj, indent, lvl, methodSep):
-    assert obj.TypeId == psana.UsdUsb.ConfigV1.TypeId
-    assert obj.Version == psana.UsdUsb.ConfigV1.Version
-    methodStrings = []
-    # idx_list_one_line_methods
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'counting_mode'
-    try:
-       for idx in range( 4 ):
-            methodStr += ' [%d]' % idx
-            methodStr += '=%s' % enum_to_str( obj.counting_mode(idx) )
-       methodStrings.append( methodStr )
-    except:
-       for idx, subObj in enumerate( obj.counting_mode() ):
-            methodStr += ' [%d]' % idx
-            methodStr += '=%s' % enum_to_str( subObj )
-       methodStrings.append( methodStr )
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'quadrature_mode'
-    try:
-       for idx in range( 4 ):
-            methodStr += ' [%d]' % idx
-            methodStr += '=%s' % enum_to_str( obj.quadrature_mode(idx) )
-       methodStrings.append( methodStr )
-    except:
-       for idx, subObj in enumerate( obj.quadrature_mode() ):
-            methodStr += ' [%d]' % idx
-            methodStr += '=%s' % enum_to_str( subObj )
-       methodStrings.append( methodStr )
-    methodStrings = [meth for meth in methodStrings if len(meth)>0]
-    return methodSep.join(methodStrings)
-
-def UsdUsb_DataV1_to_str(obj, indent, lvl, methodSep):
-    assert obj.TypeId == psana.UsdUsb.DataV1.TypeId
-    assert obj.Version == psana.UsdUsb.DataV1.Version
-    methodStrings = []
-    # one_line_methods
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'digital_in: %s' % uint8_to_str( obj.digital_in() )
-    methodStrings.append(methodStr)                                 
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'timestamp: %s' % uint32_to_str( obj.timestamp() )
-    methodStrings.append(methodStr)                                 
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'status: %s' % ndarray_to_str( obj.status() )
-    methodStrings.append(methodStr)                                 
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'analog_in: %s' % ndarray_to_str( obj.analog_in() )
-    methodStrings.append(methodStr)                                 
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'encoder_count: %s' % ndarray_to_str( obj.encoder_count() )
     methodStrings.append(methodStr)                                 
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
@@ -8635,6 +8685,7 @@ objFunctionTable = {
     (psana.Arraychar.DataV1.TypeId,1) : Arraychar_DataV1_to_str,
     (psana.Bld.BldDataAcqADCV1.TypeId,1) : Bld_BldDataAcqADCV1_to_str,
     (psana.Bld.BldDataAnalogInputV1.TypeId,1) : Bld_BldDataAnalogInputV1_to_str,
+    (psana.Bld.BldDataBeamMonitorV1.TypeId,1) : Bld_BldDataBeamMonitorV1_to_str,
     (psana.Bld.BldDataEBeamV0.TypeId,0) : Bld_BldDataEBeamV0_to_str,
     (psana.Bld.BldDataEBeamV1.TypeId,1) : Bld_BldDataEBeamV1_to_str,
     (psana.Bld.BldDataEBeamV2.TypeId,2) : Bld_BldDataEBeamV2_to_str,
@@ -8655,6 +8706,7 @@ objFunctionTable = {
     (psana.Bld.BldDataPimV1.TypeId,1) : Bld_BldDataPimV1_to_str,
     (psana.Bld.BldDataSpectrometerV0.TypeId,0) : Bld_BldDataSpectrometerV0_to_str,
     (psana.Bld.BldDataSpectrometerV1.TypeId,1) : Bld_BldDataSpectrometerV1_to_str,
+    (psana.Bld.BldDataUsdUsbV1.TypeId,1) : Bld_BldDataUsdUsbV1_to_str,
     (psana.Camera.FrameFccdConfigV1.TypeId,1) : Camera_FrameFccdConfigV1_to_str,
     (psana.Camera.FrameFexConfigV1.TypeId,1) : Camera_FrameFexConfigV1_to_str,
     (psana.Camera.FrameV1.TypeId,1) : Camera_FrameV1_to_str,
