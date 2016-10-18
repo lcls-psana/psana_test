@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-55
+2016-10-17 David Schneider
+- update to pdsdata 8.6.17 and psddldata V01-00-49 for fix to BldDataBeamMonitorV1
+
 Tag: V00-08-54
 2016-9-30 David Schneider
 - update to pdsdata 8.6.16 and psddldata V01-00-48 for BldDataBeamMonitorV1 and BldUsdUsbV1
