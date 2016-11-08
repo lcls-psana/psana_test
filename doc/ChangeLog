@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-56
+2016-11-10 David Schneider
+-  update to pdsdata 8.6.18 for ControlsCameraConfig
+
 Tag: V00-08-55
 2016-10-17 David Schneider
 - update to pdsdata 8.6.17 and psddldata V01-00-49 for fix to BldDataBeamMonitorV1

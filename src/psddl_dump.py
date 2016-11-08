@@ -3240,6 +3240,40 @@ def Camera_TwoDGaussianV1_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def Camera_ControlsCameraConfigV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Camera.ControlsCameraConfigV1.TypeId
+    assert obj.Version == psana.Camera.ControlsCameraConfigV1.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'width: %s' % uint32_to_str( obj.width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'height: %s' % uint32_to_str( obj.height() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'depth: %s' % uint32_to_str( obj.depth() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposure_time: %s' % double_to_str( obj.exposure_time() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gain: %s' % double_to_str( obj.gain() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'manufacturer: %s' % str_to_str( obj.manufacturer() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'model: %s' % str_to_str( obj.model() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'color_mode:\n'
+    methodStr += enum_to_str(obj.color_mode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def TimeTool_EventLogic_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
     # one_line_methods
@@ -8704,6 +8738,7 @@ objFunctionTable = {
     (psana.Bld.BldDataSpectrometerV0.TypeId,0) : Bld_BldDataSpectrometerV0_to_str,
     (psana.Bld.BldDataSpectrometerV1.TypeId,1) : Bld_BldDataSpectrometerV1_to_str,
     (psana.Bld.BldDataUsdUsbV1.TypeId,1) : Bld_BldDataUsdUsbV1_to_str,
+    (psana.Camera.ControlsCameraConfigV1.TypeId,1) : Camera_ControlsCameraConfigV1_to_str,
     (psana.Camera.FrameFccdConfigV1.TypeId,1) : Camera_FrameFccdConfigV1_to_str,
     (psana.Camera.FrameFexConfigV1.TypeId,1) : Camera_FrameFexConfigV1_to_str,
     (psana.Camera.FrameV1.TypeId,1) : Camera_FrameV1_to_str,
