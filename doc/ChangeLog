@@ -12,6 +12,10 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-08-56
+2016-12-16 David Schneider
+- update to pdsdata 8.7.0 for JungFrau detector
+
+Tag: V00-08-56
 2016-11-10 David Schneider
 -  update to pdsdata 8.6.18 for ControlsCameraConfig
 

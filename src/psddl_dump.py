@@ -3638,6 +3638,82 @@ def Rayonix_ConfigV2_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def Fli_ConfigV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Fli.ConfigV1.TypeId
+    assert obj.Version == psana.Fli.ConfigV1.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'width: %s' % uint32_to_str( obj.width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'height: %s' % uint32_to_str( obj.height() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'orgX: %s' % uint32_to_str( obj.orgX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'orgY: %s' % uint32_to_str( obj.orgY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binX: %s' % uint32_to_str( obj.binX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binY: %s' % uint32_to_str( obj.binY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureTime: %s' % float_to_str( obj.exposureTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'coolingTemp: %s' % float_to_str( obj.coolingTemp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gainIndex: %s' % uint8_to_str( obj.gainIndex() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutSpeedIndex: %s' % uint8_to_str( obj.readoutSpeedIndex() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureEventCode: %s' % uint16_to_str( obj.exposureEventCode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numDelayShots: %s' % uint32_to_str( obj.numDelayShots() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameSize: %s' % uint32_to_str( obj.frameSize() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsX: %s' % uint32_to_str( obj.numPixelsX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsY: %s' % uint32_to_str( obj.numPixelsY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixels: %s' % uint32_to_str( obj.numPixels() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def Fli_FrameV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Fli.FrameV1.TypeId
+    assert obj.Version == psana.Fli.FrameV1.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'shotIdStart: %s' % uint32_to_str( obj.shotIdStart() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutTime: %s' % float_to_str( obj.readoutTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'temperature: %s' % float_to_str( obj.temperature() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data: %s' % ndarray_to_str( obj.data() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def Pulnix_TM6740ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Pulnix.TM6740ConfigV1.TypeId
     assert obj.Version == psana.Pulnix.TM6740ConfigV1.Version
@@ -7761,78 +7837,63 @@ def EpixSampler_ElementV1_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
-def Fli_ConfigV1_to_str(obj, indent, lvl, methodSep):
-    assert obj.TypeId == psana.Fli.ConfigV1.TypeId
-    assert obj.Version == psana.Fli.ConfigV1.Version
+def Jungfrau_ConfigV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Jungfrau.ConfigV1.TypeId
+    assert obj.Version == psana.Jungfrau.ConfigV1.Version
     methodStrings = []
     # one_line_methods
     methodStr = doIndent(indent, lvl)
-    methodStr += 'width: %s' % uint32_to_str( obj.width() )
+    methodStr += 'numberOfModules: %s' % uint32_to_str( obj.numberOfModules() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'height: %s' % uint32_to_str( obj.height() )
+    methodStr += 'numberOfRowsPerModule: %s' % uint32_to_str( obj.numberOfRowsPerModule() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'orgX: %s' % uint32_to_str( obj.orgX() )
+    methodStr += 'numberOfColumnsPerModule: %s' % uint32_to_str( obj.numberOfColumnsPerModule() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'orgY: %s' % uint32_to_str( obj.orgY() )
+    methodStr += 'biasVoltage: %s' % uint32_to_str( obj.biasVoltage() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'binX: %s' % uint32_to_str( obj.binX() )
+    methodStr += 'triggerDelay: %s' % double_to_str( obj.triggerDelay() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'binY: %s' % uint32_to_str( obj.binY() )
-    methodStrings.append(methodStr)                                 
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'exposureTime: %s' % float_to_str( obj.exposureTime() )
-    methodStrings.append(methodStr)                                 
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'coolingTemp: %s' % float_to_str( obj.coolingTemp() )
-    methodStrings.append(methodStr)                                 
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'gainIndex: %s' % uint8_to_str( obj.gainIndex() )
-    methodStrings.append(methodStr)                                 
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'readoutSpeedIndex: %s' % uint8_to_str( obj.readoutSpeedIndex() )
-    methodStrings.append(methodStr)                                 
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'exposureEventCode: %s' % uint16_to_str( obj.exposureEventCode() )
-    methodStrings.append(methodStr)                                 
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'numDelayShots: %s' % uint32_to_str( obj.numDelayShots() )
+    methodStr += 'exposureTime: %s' % double_to_str( obj.exposureTime() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'frameSize: %s' % uint32_to_str( obj.frameSize() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'numPixelsX: %s' % uint32_to_str( obj.numPixelsX() )
-    methodStrings.append(methodStr)                                 
-    methodStr = doIndent(indent, lvl)
-    methodStr += 'numPixelsY: %s' % uint32_to_str( obj.numPixelsY() )
-    methodStrings.append(methodStr)                                 
-    methodStr = doIndent(indent, lvl)
     methodStr += 'numPixels: %s' % uint32_to_str( obj.numPixels() )
     methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gainMode:\n'
+    methodStr += enum_to_str(obj.gainMode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'speedMode:\n'
+    methodStr += enum_to_str(obj.speedMode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
-def Fli_FrameV1_to_str(obj, indent, lvl, methodSep):
-    assert obj.TypeId == psana.Fli.FrameV1.TypeId
-    assert obj.Version == psana.Fli.FrameV1.Version
+def Jungfrau_ElementV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Jungfrau.ElementV1.TypeId
+    assert obj.Version == psana.Jungfrau.ElementV1.Version
     methodStrings = []
     # one_line_methods
     methodStr = doIndent(indent, lvl)
-    methodStr += 'shotIdStart: %s' % uint32_to_str( obj.shotIdStart() )
+    methodStr += 'frameNumber: %s' % uint32_to_str( obj.frameNumber() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'readoutTime: %s' % float_to_str( obj.readoutTime() )
+    methodStr += 'ticks: %s' % uint32_to_str( obj.ticks() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'temperature: %s' % float_to_str( obj.temperature() )
+    methodStr += 'fiducials: %s' % uint32_to_str( obj.fiducials() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'data: %s' % ndarray_to_str( obj.data() )
+    methodStr += 'frame: %s' % ndarray_to_str( obj.frame() )
     methodStrings.append(methodStr)                                 
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
@@ -8796,6 +8857,8 @@ objFunctionTable = {
     (psana.Ipimb.ConfigV2.TypeId,2) : Ipimb_ConfigV2_to_str,
     (psana.Ipimb.DataV1.TypeId,1) : Ipimb_DataV1_to_str,
     (psana.Ipimb.DataV2.TypeId,2) : Ipimb_DataV2_to_str,
+    (psana.Jungfrau.ConfigV1.TypeId,1) : Jungfrau_ConfigV1_to_str,
+    (psana.Jungfrau.ElementV1.TypeId,1) : Jungfrau_ElementV1_to_str,
     (psana.L3T.ConfigV1.TypeId,1) : L3T_ConfigV1_to_str,
     (psana.L3T.DataV1.TypeId,1) : L3T_DataV1_to_str,
     (psana.L3T.DataV2.TypeId,2) : L3T_DataV2_to_str,
