@@ -1,11 +1,12 @@
 from __future__ import print_function
+from __future__ import absolute_import
 import io
 import os
 import sys
 import time
 import glob
 import copy
-import psanaTestLib as ptl
+from . import psanaTestLib as ptl
 from psmon.plots import Image
 from psmon import publish
 import socket

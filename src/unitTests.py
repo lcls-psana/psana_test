@@ -169,7 +169,7 @@ class Psana( unittest.TestCase ) :
             f.close()
             os.remove(myfile)
             ds = psana.DataSource('dir=%s:exp=xcstut13:run=999:idx' % dataSourceDir)
-            run = ds.runs().next()
+            run = next(ds.runs())
             expectFid = [5366,11177,14060]
             expectSec = [1339858956,1339858972,1339858980]
             expectNsec = [671607864,816395836,826443448]
@@ -199,7 +199,7 @@ class Psana( unittest.TestCase ) :
         psana.setConfigFile('')
         ds = psana.DataSource(TEST_73)
         epicsStore = ds.env().epicsStore()
-        ds.events().next()  # advance to event 0
+        next(ds.events())  # advance to event 0
         pvName = 'CXI:R56:SHV:VHS2:CH1:CurrentMeasure'
         pv = epicsStore.getPV(pvName)
         self.assertFalse(pv is None, msg="could not get %s from epics store" % pvName)
@@ -320,7 +320,7 @@ class Psana( unittest.TestCase ) :
             self.assertEqual(len(estore.pvNames()), 227, msg="xtc: estore does not have expected number of pvNames")
             checkAliases(self, aliases, estore, "xtc configure")
             # go to the next event
-            dsXtc.events().next()
+            next(dsXtc.events())
             pv0 = estore.getPV(src0_pvid_4['pvname'])
             pv1 = estore.getPV(src1_pvid_4['pvname'])
             self.assertTrue(pv0 is not None, msg="xtc: src0 pvid4 pvname=%s not found during event 0" % src0_pvid_4['pvname'])
@@ -366,7 +366,7 @@ class Psana( unittest.TestCase ) :
             self.assertTrue((alias0 is None) or (alias1 is None), msg="h5: one of the src0 pvid4 and scr1 pvid4 aliases is not none")
             self.assertFalse((alias0 is None) and (alias1 is None), msg="h5: both the scr0 pvid4 and src1 pvid4 aliases are none")
             # go to the next event
-            dsH5.events().next()
+            next(dsH5.events())
             pv0 = estore.getPV(src0_pvid_4['pvname'])
             pv1 = estore.getPV(src1_pvid_4['pvname'])
             self.assertTrue(pv0 is not None, msg="src0 pvid4 pvname=%s not found during event 0" % src0_pvid_4['pvname'])
@@ -644,7 +644,7 @@ class Psana( unittest.TestCase ) :
         psana.setConfigFile('')
         psana.setOption('modules','Translator.TestModuleNDArrayString psana_test.PsanaModulePutStr psana_test.PsanaModuleGetStr')
         ds = psana.DataSource(TEST_42)
-        evt = ds.events().next()
+        evt = next(ds.events())
         # if we got this far, then the psana_test.PsanaModuleGetStr C++ module got the 
         # string from the Python module psana_test.PsanaModulePutStr.
         # So Python -> C++ is working.
