@@ -1,3 +1,4 @@
+from __future__ import print_function
 #--------------------------------------------------------------------------
 # Description:
 #   Test script for pdsdata
@@ -137,8 +138,8 @@ class Pdsdata( unittest.TestCase ) :
             if testNo in testsWithSameEventKeys:
                 self.assertEqual(diffout, "", msg="evKeys output differ. dir=%s:\n%s" % (self.outputDir, diffout))
             elif diffout != '':
-                print "== diffout error =="
-                print diffout
+                print("== diffout error ==")
+                print(diffout)
             lastTestTime = time.time()-t0
 
 if __name__ == "__main__":

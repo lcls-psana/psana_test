@@ -1,3 +1,4 @@
+from __future__ import print_function
 import io
 import os
 import sys
@@ -50,8 +51,8 @@ def getSmlDataFiles(inputdir, run, verbose):
     if verbose:
         for stream, chunk2fsize in result.iteritems():
             for chunk, finfo in chunk2fsize.iteritems():
-                print "stream=%2d chunk=%2d fsize=%.2fMB fname=%s" % \
-                    (stream, chunk, finfo['size']/float(1<<20), finfo['fname'])
+                print("stream=%2d chunk=%2d fsize=%.2fMB fname=%s" % \
+                    (stream, chunk, finfo['size']/float(1<<20), finfo['fname']))
     return result
 
 class MapFile(object):
@@ -63,7 +64,7 @@ class MapFile(object):
         for stream, streamPos in self.lastStreamPos.iteritems():
             streamPos['offset']=0
         if verbose:
-            print "mapfile initialized with streams: %s" % self.lastStreamPos.keys()
+            print("mapfile initialized with streams: %s" % self.lastStreamPos.keys())
 
     def parseLine(self, ln):
         stream2pos = {}
@@ -115,13 +116,13 @@ class FileHandler(object):
                 inprogress = outputfile + ".inprogress"
                 if os.path.exists(outputfile): 
                     os.unlink(outputfile)
-                    if self.verbose: print "removed %s" % outputfile
+                    if self.verbose: print("removed %s" % outputfile)
                 if os.path.exists(inprogress): 
                     os.unlink(inprogress)
-                    if self.verbose: print "removed %s" % inprogress
+                    if self.verbose: print("removed %s" % inprogress)
                 if chunk == 0:
                     os.system('touch %s' % inprogress)
-                    if self.verbose: print "started writing %s" % inprogress
+                    if self.verbose: print("started writing %s" % inprogress)
                     self.stream2inprogress[stream] = {'chunk':chunk,
                                                       'infilename':fname,
                                                       'outinprogress':inprogress,
@@ -157,7 +158,7 @@ class FileHandler(object):
         outfinal = self.stream2inprogress[stream]['outfinal']
         os.system('mv %s %s' % (outinprogress, outfinal))
         assert os.stat(outfinal).st_size == os.stat(self.stream2inprogress[stream]['infilename']).st_size
-        if self.verbose: print "moved inprogress to final: %s" % outfinal
+        if self.verbose: print("moved inprogress to final: %s" % outfinal)
 
     def copyBlock(self, stream, lastPos, nextPos):
         lastChunk, lastOffset = lastPos['chunk'], lastPos['offset']
@@ -184,9 +185,9 @@ BEHIND_WARNINGS = 0
 def wait(sec):
     if sec <=0: 
         if BEHIND_WARNINGS == 20:
-            print "falling behind, not waiting (last warning)"
+            print("falling behind, not waiting (last warning)")
         elif BEHIND_WARNINGS < 20:
-            print "falling behind, not waiting"
+            print("falling behind, not waiting")
         return
     time.sleep(sec)
 
@@ -207,14 +208,14 @@ def smallDataMover(inputdir, outputdir, run, numEventsToWrite, rate, mapfilename
     earlyEnd = False
 
     if verbose:
-        print "enter: psplot -s %s EVTCOUNTER" % socket.gethostname()
+        print("enter: psplot -s %s EVTCOUNTER" % socket.gethostname())
 
     while (stream2nextPos is not None):
         t0 = time.time()
         for stream, nextPos in stream2nextPos.iteritems():
             fileHandler.copyBlock(stream, stream2lastPos[stream], nextPos)
         if verbose:
-            print "copied stream blocks to about event=%8d" % nextEvent
+            print("copied stream blocks to about event=%8d" % nextEvent)
             img = Image(nextEvent, "EventCounter", np.zeros((2,2)))
             publish.send("EVTCOUNTER", img)
         if ((numEventsToWrite > 0) and (numEventsToWrite < nextEvent)): 

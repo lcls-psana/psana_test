@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import io
 import sys
@@ -45,8 +46,8 @@ def inProgressCopyWithThrottle(src, dest, start_delay, mb_per_write, inprogress_
         if verbose:
             now = datetime.datetime.fromtimestamp(time.time())
             lock.acquire()
-            print "dest=%s time=%4.4d-%2.2d-%2.2d::%2.2d:%2.2d:%2.2d.%6.6d: %s" % \
-                (os.path.basename(dest), now.year, now.month, now.day, now.hour, now.minute, now.second, now.microsecond, msg)
+            print("dest=%s time=%4.4d-%2.2d-%2.2d::%2.2d:%2.2d:%2.2d.%6.6d: %s" % \
+                (os.path.basename(dest), now.year, now.month, now.day, now.hour, now.minute, now.second, now.microsecond, msg))
             lock.release()
 
     ##################

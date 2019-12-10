@@ -1,3 +1,4 @@
+from __future__ import print_function
 #--------------------------------------------------------------------------
 # Description:
 #   unit tests for external packages
@@ -150,7 +151,7 @@ rowIdx     timestampHigh, timestampLow, eventCode
             f=h5py.File(outfile)
 
             for dsKey, expectedOutput in expectedOutputs.iteritems():
-                print "\n\n*****Made it!*******"
+                print("\n\n*****Made it!*******")
                 origStdout = sys.stdout
                 sys.stdout = StringIO.StringIO()
                 try:

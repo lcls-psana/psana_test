@@ -1,4 +1,5 @@
 #!@PYTHON@
+from __future__ import print_function
 
 import os
 import sys
@@ -56,22 +57,22 @@ def statSelf():
     return returnDict
 
 def processMachineReport(hp):
-    print hp.heap()
+    print(hp.heap())
     statDict = statSelf()
-    print "  /proc/self/stat: majflt=%s rss=%.2f vsize=%.2f mb" % (statDict['majflt'], statDict['rss'], statDict['vsize']/(1024*1024.0))
+    print("  /proc/self/stat: majflt=%s rss=%.2f vsize=%.2f mb" % (statDict['majflt'], statDict['rss'], statDict['vsize']/(1024*1024.0)))
 
 def psanaMonit(numEventsToDo, eventKeys, eventIds, extract, dataset):
     import psana
     hp = hpy()
     hp.setrelheap()  # start point, relative to this heap
     ds = psana.DataSource(dataset)
-    print "---------- BEFORE RUNNING PSANA ON DATASET -------------"
+    print("---------- BEFORE RUNNING PSANA ON DATASET -------------")
     processMachineReport(hp)
-    print "  psutil.mem: %s" % (psutil.virtual_memory(),)
+    print("  psutil.mem: %s" % (psutil.virtual_memory(),))
 
     if eventKeys:
-        print "---------- CONFIGURE EVENT KEYS ---------"
-        print "  " + "  \n".join(map(str,ds.env().configStore().keys()))
+        print("---------- CONFIGURE EVENT KEYS ---------")
+        print("  " + "  \n".join(map(str,ds.env().configStore().keys())))
 
     totalTime0 = time.time()
     extractTime = 0
@@ -92,13 +93,13 @@ def psanaMonit(numEventsToDo, eventKeys, eventIds, extract, dataset):
                 if eventIds or eventKeys:
                     evId = evt.get(psana.EventId)
                     sec,nsec = evId.time()
-                    print "-- run=%3.3d step=%4.4d event=%8.8d sec=%8d nsec=%8d fid=%d" % \
-                        (numRuns, numSteps, numEvents, sec, nsec, evId.fiducials())
+                    print("-- run=%3.3d step=%4.4d event=%8.8d sec=%8d nsec=%8d fid=%d" % \
+                        (numRuns, numSteps, numEvents, sec, nsec, evId.fiducials()))
                 if eventKeys or extract:
                     for key in evt.keys():
                         if key.type() is None: continue
                         if eventKeys:
-                            print "  %s" % key
+                            print("  %s" % key)
                         if extract:
                             t0=time.time()
                             pyObj = evt.get(key.type(), key.src(), key.key())
@@ -107,12 +108,12 @@ def psanaMonit(numEventsToDo, eventKeys, eventIds, extract, dataset):
         if stopEarly: break
     totalTime = time.time()-totalTime0
     rate = numEvents/totalTime
-    print "--------- SUMMARY ----------"
-    print "procssed %d events at %.2f Hz (%.2f sec)" % (numEvents, rate, totalTime)
+    print("--------- SUMMARY ----------")
+    print("procssed %d events at %.2f Hz (%.2f sec)" % (numEvents, rate, totalTime))
     if extract:
-        print "extraction tool %.2f %% of total time, or %.2f sec" % (100.0*extractTime/totalTime, extractTime)
+        print("extraction tool %.2f %% of total time, or %.2f sec" % (100.0*extractTime/totalTime, extractTime))
     processMachineReport(hp)
-    print "  psutil.mem: %s" % (psutil.virtual_memory(),)
+    print("  psutil.mem: %s" % (psutil.virtual_memory(),))
             
 
 programDescription = '''

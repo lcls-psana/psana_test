@@ -1,3 +1,4 @@
+from __future__ import print_function
 #!@PYTHON@
 
 import sys
@@ -12,7 +13,7 @@ class CircDepend( unittest.TestCase ) :
 
   def test_circDependXtc(self):
     from XtcInput.PyDgramListUtil import xtcFileNameStreamChunk, getDgramInfo
-    print "success, imported utilities directly from XtcInput"
+    print("success, imported utilities directly from XtcInput")
 
 if __name__ == "__main__":
     # now run the tests in unitTests, this routine does not return.

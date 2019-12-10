@@ -1,3 +1,4 @@
+from __future__ import print_function
 #--------------------------------------------------------------------------
 # Description:
 #   Test script for psana_test
@@ -99,15 +100,15 @@ class Psana( unittest.TestCase ) :
         p = sb.Popen(psana_cmd,shell=True,stdout=sb.PIPE, stderr=sb.PIPE)
         o,e = p.communicate()
         if self.verbose:
-            print "===== psana cmd ======"
-            print psana_cmd
+            print("===== psana cmd ======")
+            print(psana_cmd)
             if cfgfile is not None:
-                print "===== psana cfg file ===="
-                print cfgfile.read()
-            print "===== psana stdout ===="
-            print o
-            print "===== psana stderr ===="
-            print e
+                print("===== psana cfg file ====")
+                print(cfgfile.read())
+            print("===== psana stdout ====")
+            print(o)
+            print("===== psana stderr ====")
+            print(e)
             sys.stdout.flush()
         if errorCheck:
             for output,source in zip([o,e],['stdout','stderr']):
@@ -870,7 +871,7 @@ class Psana( unittest.TestCase ) :
             mvCmd += ' -m .1'
             if params.verboseMover:
                 mvCmd += ' -v'
-                print mvCmd
+                print(mvCmd)
             os.system('%s&' % mvCmd)
             return inProgressDir
 
@@ -888,12 +889,12 @@ class Psana( unittest.TestCase ) :
             assert len(finishedFiles)==0
             assert len(inProgressFiles)>0
             if params.verboseMover:
-                print "Before starting psana on inprogress:\n%s" % ptl.cmdTimeOut("ls -lrth %s" % inProgressDir)[0]
+                print("Before starting psana on inprogress:\n%s" % ptl.cmdTimeOut("ls -lrth %s" % inProgressDir)[0])
             
             eventIdsOut = os.path.join(inProgressDir, "eventid.inprogress.output")
             cmd = eventIdCmd(params, inProgressDir, eventIdsOut, livemode=True)
             if params.verboseMover:
-                print cmd
+                print(cmd)
             os.system(cmd)
             return eventIdsOut
 
@@ -906,14 +907,14 @@ class Psana( unittest.TestCase ) :
             eventIdsOut = os.path.join(inProgressDir, "eventid.finished.output")
             cmd = eventIdCmd(params, inProgressDir, eventIdsOut, livemode=False)
             if params.verboseMover:
-                print cmd
+                print(cmd)
             os.system(cmd)
             return eventIdsOut
 
         def compareEventIds(params, inProgressEventIds, finishedEventIds):
             cmd = 'diff -u %s %s' % (inProgressEventIds, finishedEventIds)
             if params.verboseMover:
-                print cmd
+                print(cmd)
             stdout, stderr = ptl.cmdTimeOut(cmd)
             self.assertEqual(stderr.strip(),'', "Error on cmd=%s\nstderr=\n%s" % (cmd, stderr))
             self.assertEqual(stdout.strip(),'', "Error on cmd=%s\nstdout=\n%s" % (cmd, stdout))

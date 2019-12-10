@@ -1,3 +1,4 @@
+from __future__ import print_function
 #--------------------------------------------------------------------------
 # Description:
 #   Test script for psana_test
@@ -89,7 +90,7 @@ class LiveMode( unittest.TestCase ) :
         '''
         with self.outdir:
             self.setupWithinContext()
-            print self.moverCmdWithoutRate
+            print(self.moverCmdWithoutRate)
             os.system("%s --hertz 120&" % self.moverCmdWithoutRate)
 
             liveAvail = psana.LiveAvail()
@@ -104,8 +105,8 @@ class LiveMode( unittest.TestCase ) :
                 time.sleep(delay)
                 processed += 1
 
-            print "finished liveAvail loop with processing delay of %.3f" % delay
-            print "skipped=%d processed=%d total=%d" % (skipped, processed, skipped + processed)
+            print("finished liveAvail loop with processing delay of %.3f" % delay)
+            print("skipped=%d processed=%d total=%d" % (skipped, processed, skipped + processed))
             self.assertEqual(processed+skipped, 2338, msg='expected 2338 events in test data, but got %d' % (processed+skipped))
             self.assertGreater(skipped, 0, msg="with delay of 9ms, should have skipped some events?")
 
@@ -121,9 +122,9 @@ class LiveMode( unittest.TestCase ) :
                 evtId = evt.get(psana.EventId)
                 if evtId is not None:
                     deadEventTimes.append(str(evtId))
-            print "finished dead dset=%s in %.2f sec #events=%d" % (self.srcDataset, 
+            print("finished dead dset=%s in %.2f sec #events=%d" % (self.srcDataset, 
                                                                      time.time()-t0, 
-                                                                     len(deadEventTimes))
+                                                                     len(deadEventTimes)))
 
             os.system("%s --hertz 500&" % self.moverCmdWithoutRate)
             t0 = time.time()
@@ -133,9 +134,9 @@ class LiveMode( unittest.TestCase ) :
                 evtId = evt.get(psana.EventId)
                 if evtId is not None:
                     liveEventTimes.append(str(evtId))
-            print "finished live: dset=%s in %.2f sec #events=%d" % (self.destDataset, 
+            print("finished live: dset=%s in %.2f sec #events=%d" % (self.destDataset, 
                                                                      time.time()-t0, 
-                                                                     len(liveEventTimes))
+                                                                     len(liveEventTimes)))
 
 
             self.assertEqual(len(liveEventTimes), len(deadEventTimes), 

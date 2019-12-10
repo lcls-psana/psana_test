@@ -1,3 +1,4 @@
+from __future__ import print_function
 import sys
 import os
 import psana
@@ -47,7 +48,7 @@ class dump(object):
             else:
                 fullOutputFile = self.outputFile
             if os.path.exists(fullOutputFile):
-                print "warning: overwritting %s" % fullOutputFile
+                print("warning: overwritting %s" % fullOutputFile)
             self.fout = file(fullOutputFile,'w')
         else:
             self.fout = sys.stdout

@@ -1,3 +1,4 @@
+from __future__ import print_function
 # This is a script for managing and running tests with the psana test data. From the release directory do
 #
 #        python psana_test/src/psanaTestLib.py
@@ -291,7 +292,7 @@ def get_md5sum(fname, verbose=False):
     '''
     assert os.path.exists(fname), "filename %s does not exist" % fname
     cmd = 'md5sum %s' % fname
-    if verbose: print cmd
+    if verbose: print(cmd)
     secondsTimeOut = 15*60
     t0=time.time()
     o,e = cmdTimeOut(cmd, seconds=secondsTimeOut)
@@ -318,7 +319,7 @@ def psanaDump(inDataset, outfile, events=None, dumpEpicsAliases=False, regressDu
     if not dumpBeginJobEvt:
         beginJobEvtStr = '-o psana_test.dump.dump_beginjob_evt=False'
     cmd = 'psana  -c "" %s -m psana_test.dump %s %s %s %s' % (numEventsStr, epicAliasStr, regressDumpStr, beginJobEvtStr, inDataset)
-    if verbose: print cmd
+    if verbose: print(cmd)
     p = sb.Popen(cmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
     out,err = p.communicate()
     fout = file(outfile,'w')
@@ -379,7 +380,7 @@ class XtcLine(object):
             try:
                 ln,val = ln.split(fld)
             except ValueError:
-                print "ln=%s\nfld=%s" % (ln,fld)
+                print("ln=%s\nfld=%s" % (ln,fld))
                 raise
             attr = fld.strip().replace('=','')
             setattr(self,attr,tp(val))
@@ -544,8 +545,8 @@ def previousDumpFile(deleteDump=True, doall=False):
         fout = file(prevFullName,'a')
     testTimes = {'xtc':{}, 'multi':{}}
     regressTests = readRegressionTestFile()
-    print "** prev: carrying out md5 sum of xtc, psana_test.dump of xtc and regression tests."
-    print "   (dump a few events for some xtc, without epics aliases in dump, and no epics pvId's in dump)"
+    print("** prev: carrying out md5 sum of xtc, psana_test.dump of xtc and regression tests.")
+    print("   (dump a few events for some xtc, without epics aliases in dump, and no epics pvId's in dump)")
     testFiles = getTestFiles()
     multiTests = getMultiDatasets()
     with outputDir('pstst') as outDir:
@@ -618,10 +619,10 @@ def previousDumpFile(deleteDump=True, doall=False):
                     fout.write('\n')
                 fout.flush()
                 testTimes[src][testNumber] = time.time()-t0
-                print "** prev:  %s test=%3d time=%.2f seconds" % (src, testNumber, testTimes[src][testNumber])
+                print("** prev:  %s test=%3d time=%.2f seconds" % (src, testNumber, testTimes[src][testNumber]))
     fout.close()
     testsTime = sum(testTimes['xtc'].values())+sum(testTimes['multi'].values())
-    print "* tests time: %.2f sec, or %.2f min" % (testsTime,testsTime/60.0)
+    print("* tests time: %.2f sec, or %.2f min" % (testsTime,testsTime/60.0))
 
 def readPrevious():
     '''This parses the file of previous md5 resuls for the 
@@ -757,12 +758,12 @@ def makeTypeLinks(args):
                 lnk = os.path.join(expandSitRoot(),
                                    'data_test/types/%s.xtc' % tpForFileName)
                 if os.path.exists(lnk):
-                    print "    already exists, skipping %s" % lnk
+                    print("    already exists, skipping %s" % lnk)
                     continue
                 lnkCmd = 'ln -s %s %s' % (fullPath, lnk)
                 o,e = cmdTimeOut(lnkCmd)
                 assert len(e)==0, "**Failure with cmd=%s\nerr=%s" % (lnkCmd,e)
-                print lnkCmd
+                print(lnkCmd)
                 linksMade.add(tp)
         if doEpics:
             epicsDbrNumElem = getEpicsTypes(fullPath)
@@ -771,12 +772,12 @@ def makeTypeLinks(args):
                 if epicsLnk in linksMade: continue
                 lnk = os.path.join(expandSitRoot(), 'data_test/types/%s.xtc' % epicsLnk)
                 if os.path.exists(lnk):
-                    print "    already exists, skipping %s" % lnk
+                    print("    already exists, skipping %s" % lnk)
                     continue
                 lnkCmd = 'ln -s %s %s' % (fullPath, lnk)
                 o,e = cmdTimeOut(lnkCmd)
                 assert len(e)==0, "**Failure with cmd=%s\nerr=%s" % (lnkCmd,e)
-                print lnkCmd
+                print(lnkCmd)
                 linksMade.add(epicsLnk)
 
 def getEpicsTestNumbers():
@@ -835,63 +836,63 @@ def testShmCommand(args):
         xtcserverCmdStderr = os.path.join(OUTDIR,'testShm.xtcserver.stderr')
         dataSource = 'shmem=%s.0' % shmemName
         dumpcmd = 'psana -m psana_test.dump %s' % dataSource
-        print "about to launch commands:"
-        print xtcservercmd
-        print dumpcmd
+        print("about to launch commands:")
+        print(xtcservercmd)
+        print(dumpcmd)
         expectedSharedMemoryFile = "/dev/shm/PdsMonitorSharedMemory_%s" % shmemName
         if os.path.exists(expectedSharedMemoryFile):
-            print "ERROR: shared memory file exists: %s" % expectedSharedMemoryFile
-            print " delete (if safe) and rerun test"
+            print("ERROR: shared memory file exists: %s" % expectedSharedMemoryFile)
+            print(" delete (if safe) and rerun test")
             return
         outputFiles = [xtcserverCmdStderr, xtcserverCmdStdout]
         for outputFile in outputFiles:
             if os.path.exists(outputFile):
-                print "warning: test output file exists. deleting: %s" % outputFile
+                print("warning: test output file exists. deleting: %s" % outputFile)
                 os.unlink(outputFile)
 
         xtcservercmd += ' > %s 2>%s &' % (xtcserverCmdStdout, xtcserverCmdStderr)
         # run server in background while running dumpcmd
-        print "running server cmd in bkgnd"
+        print("running server cmd in bkgnd")
         try:
             os.system(xtcservercmd)
         except Exception,e:
-            print "ERROR running server command."
+            print("ERROR running server command.")
             if os.path.exists(expectedSharedMemoryFile):
-                print "deleteing shared memory server file: %s" % expectedSharedMemoryFile
+                print("deleteing shared memory server file: %s" % expectedSharedMemoryFile)
                 os.unlink(expectedSharedMemoryFile)
             raise e
         time.sleep(.35) # sleep a little in case the server needs time to start up    
-        print "running dump cmd"
+        print("running dump cmd")
         try:
             dumpStdout,dumpError = cmdTimeOut(dumpcmd,30)
         except Alarm, alarm:
-            print "ERROR: psana_test.dump command timed out: %s" % alarm
-            print "  run ps and clean up jobs"
-            print "  try to run test again, or try to increase the message size "
-            print "  from 10 to 32 before running this test with the command: "
-            print "  sudo /sbin/sysctl -w fs.mqueue.msg_max=32"
-            print "===== xtcserver cmd stderr ======="
-            print file(xtcserverCmdStderr).read()
-            print "===== xtcserver cmd stdout ======"
-            print file(xtcserverCmdStdout).read()
+            print("ERROR: psana_test.dump command timed out: %s" % alarm)
+            print("  run ps and clean up jobs")
+            print("  try to run test again, or try to increase the message size ")
+            print("  from 10 to 32 before running this test with the command: ")
+            print("  sudo /sbin/sysctl -w fs.mqueue.msg_max=32")
+            print("===== xtcserver cmd stderr =======")
+            print(file(xtcserverCmdStderr).read())
+            print("===== xtcserver cmd stdout ======")
+            print(file(xtcserverCmdStdout).read())
             if os.path.exists(expectedSharedMemoryFile):
-                print "deleteing shared memory server file: %s" % expectedSharedMemoryFile
+                print("deleteing shared memory server file: %s" % expectedSharedMemoryFile)
                 os.unlink(expectedSharedMemoryFile)
             raise alarm
 
         # check dump outout
-        print "===== dump stderr ====="
-        print dumpError
-        print "===== test result ====="
+        print("===== dump stderr =====")
+        print(dumpError)
+        print("===== test result =====")
         typeLines = set()
         for ln in dumpStdout.split('\n'):
             if ln.startswith('type='):
                 typeLines.add(ln.strip())
         missingTypeLines = testShmDumpTypes.difference(typeLines)
         if len(missingTypeLines)>0:
-            print "ERROR: dump output does not list the following types: %r"  % missingTypeLines
+            print("ERROR: dump output does not list the following types: %r"  % missingTypeLines)
         else:
-            print "SUCCESS! shmem test passed. dump against shared memory appears to have produced expected output"
+            print("SUCCESS! shmem test passed. dump against shared memory appears to have produced expected output")
 
         time.sleep(.5)  # sleep a bit in case the server is not finished
         toDelete = [expectedSharedMemoryFile] + outputFiles    
@@ -905,7 +906,7 @@ def translate(inDataset, outfile, numEvents, testLabel, verbose):
         numEventsStr = ' -n %d' % numEvents
     cmd = 'psana %s -m Translator.H5Output -o Translator.H5Output.output_file=%s -o Translator.H5Output.overwrite=True %s'
     cmd %= (numEventsStr, outfile, inDataset)
-    if verbose: print cmd
+    if verbose: print(cmd)
     o,e = cmdTimeOut(cmd,20*60)
     e = '\n'.join([ ln for ln in e.split('\n') if not filterPsanaStderr(ln)])
     if len(e) > 0:
@@ -913,7 +914,7 @@ def translate(inDataset, outfile, numEvents, testLabel, verbose):
         errMsg += "cmd=%s\n" % cmd
         errMsg += "\n%s" % e
         raise Exception(errMsg)
-    if verbose: print "%s: translation finished, produced: %s" % (testLabel, outfile)
+    if verbose: print("%s: translation finished, produced: %s" % (testLabel, outfile))
 
 def testCommand(args):
     # helper functions
@@ -928,7 +929,7 @@ def testCommand(args):
                 msg = "src=%s test %d: xtc filename is the same as what was "
                 msg += "recorded in previous_dump.txt. old=%s new=%s"
                 msg %= (src, num, prevInfo['xtc'], testDataInfo['basename'])
-                print msg
+                print(msg)
         elif src == 'multi':
             prevXtcs = prevInfo['xtcs']
             prevXtcs.sort()
@@ -945,7 +946,7 @@ def testCommand(args):
             if verbose:
                 msg = "src=%s test %d: all xtc filenames the same"
                 msg %= (src, num)
-                print msg
+                print(msg)
 
     def checkForSameMd5sOfXtcFiles(testDataInfo, prevInfo, src, num, verbose):
         assert src in ['xtc','multi'], "unknown src: %s" % src
@@ -973,11 +974,11 @@ def testCommand(args):
             msg = "src=%s test=%d: calculated md5 of xtc files."
             msg += " They agree with previously recorded md5s"
             msg %= (src, num)
-            print msg
+            print(msg)
 
     def compareXtcH5Dump(currentXtcDumpPath, h5DumpPath, testLabel, verbose, expectedOutput=''):
         cmd = 'diff %s %s' % (currentXtcDumpPath, h5DumpPath)
-        if verbose: print cmd
+        if verbose: print(cmd)
         o,e = cmdTimeOut(cmd,5*60)
         assert len(e)==0, "** FAILURE running cmd: %s\nstder:\n%s" % (cmd,e)
         if o.strip() != expectedOutput:
@@ -989,7 +990,7 @@ def testCommand(args):
                 msg += "-- expected output: --\n"
                 msg += expectedOutput
             raise Exception(msg)        
-        if verbose: print "%s: compared dump of xtc and dump of h5 file" % testLabel
+        if verbose: print("%s: compared dump of xtc and dump of h5 file" % testLabel)
 
     def removeFiles(files):
         for fname in files:
@@ -1056,7 +1057,7 @@ def testCommand(args):
                         assert num in prev[src], "There is a new %s test number: %s\n. Run prev command first." % (src,num)
 
         if verbose:
-            print "psanaTestLib - about to run %s tests:" % whichTest
+            print("psanaTestLib - about to run %s tests:" % whichTest)
             xtcTests = testNumberFilter['xtc']
             multiTests = testNumberFilter['multi']
             xtcTests.sort()
@@ -1064,8 +1065,8 @@ def testCommand(args):
             if whichTest == 'regress':
                 xtcTests = [x for x in xtcTests if x in regress['xtc']]
                 multiTests = [x for x in multiTests if x in regress['multi']]
-            print "  xtc: %s" % ','.join(map(str,xtcTests))
-            print " multi: %s" % ','.join(map(str,multiTests))
+            print("  xtc: %s" % ','.join(map(str,xtcTests)))
+            print(" multi: %s" % ','.join(map(str,multiTests)))
 
         testTimes = {'xtc':{}, 'multi':{}}
         for src in srcs:
@@ -1084,7 +1085,7 @@ def testCommand(args):
                 md5prev = prev[src][num]['md5dump']
                 if whichTest == 'regress':
                     if num not in regress[src]:
-                        print "warning: src=%s test=%d not in regress tests, skipping" % (src,num)
+                        print("warning: src=%s test=%d not in regress tests, skipping" % (src,num))
                         continue
                     regressStr = 'regress_'
                     numEvents = regress[src][num]['events']
@@ -1121,7 +1122,7 @@ def testCommand(args):
                 if verbose: 
                     msg = "%s%s test=%d: success: same md5 for xtc data as previously recorded" 
                     msg %= (regressStr, src, num)
-                    print msg
+                    print(msg)
 
                 h5file = os.path.join(h5dir, h5OutputBase)
                 translate(inputDataSource, h5file, numEvents, testLabel, verbose)
@@ -1138,14 +1139,14 @@ def testCommand(args):
                     removeFiles([dumpOutputPath, h5DumpPath, h5file])
                 testTime = time.time()-t0
                 testTimes[src][num]=testTime
-                print "%s success: total time: %.2f sec or %.2f min" % (testLabel,testTime,testTime/60.0)
+                print("%s success: total time: %.2f sec or %.2f min" % (testLabel,testTime,testTime/60.0))
 
     totalTestTimes = sum(testTimes['xtc'].values()) + sum(testTimes['multi'].values())
-    print "total test times: %.2f sec or %.2f min" % (totalTestTimes, totalTestTimes/60.0)
+    print("total test times: %.2f sec or %.2f min" % (totalTestTimes, totalTestTimes/60.0))
 
 def curTypesCommand(args):
     curTypes = getDataTestTypeVersions()
-    print "There are %d current typeid/version pairs" % len(curTypes)
+    print("There are %d current typeid/version pairs" % len(curTypes))
 
 def getValidTypeVersions(fullPath, dgrams=-1, getCompressedAndUncompressedVersions=False):
     typeVersions = set()
@@ -1192,7 +1193,7 @@ def getValidTypeVerFromXtcLineDumpLine(origLn, xtcFileName=''):
     return (type_name, typeid, version)
 
 def getDataTestTypeVersions():
-    print "finding type/version info in test data"
+    print("finding type/version info in test data")
     xtcPaths = []
     xtcDict = getTestFiles(noTranslator=True)
     for valDict in xtcDict.values():
@@ -1207,7 +1208,7 @@ def getDataTestTypeVersions():
         typeVersions = getValidTypeVersions(fullPath, dgrams=-1)
         for typeVersion in typeVersions:
             if typeVersion not in testTypeVersions:
-                print "new typeVersion=%s  path=%s" % (typeVersion, fullPath)
+                print("new typeVersion=%s  path=%s" % (typeVersion, fullPath))
         testTypeVersions = testTypeVersions.union(typeVersions)
     return testTypeVersions
 
@@ -1369,16 +1370,16 @@ def copyToMultiTestDir(experiment, run, numberCalibCycles, numberEventsPerCalibC
     if index:
         indexDir = os.path.join(destDir, 'index')
         if not os.path.exists(indexDir):
-            print "Creating index dir: %s" % indexDir
+            print("Creating index dir: %s" % indexDir)
             os.mkdir(indexDir)
         xtcFiles = glob.glob(os.path.join(destDir,'*.xtc'))
-        print "------------"
+        print("------------")
         for xtcFile in xtcFiles:
             outputFile = os.path.join(indexDir, os.path.basename(xtcFile) + '.idx')
             cmd = 'xtcindex -f %s -o %s' % (xtcFile, outputFile)
-            print "running command: %s" % cmd
+            print("running command: %s" % cmd)
             o,e = cmdTimeOut(cmd)
-            print "--output--\n%s\n--error--%s\n-------" % (o,e)
+            print("--output--\n%s\n--error--%s\n-------" % (o,e))
        
         
 def copyBytes(src, n, dest, mode='truncate', verbose=True):
@@ -1392,20 +1393,20 @@ def copyBytes(src, n, dest, mode='truncate', verbose=True):
     if isinstance(n,int):
         intervals = [[0,n]]
         if verbose:
-            print "copying %d bytes from src=%s to dest=%s" % (n,src,dest)
+            print("copying %d bytes from src=%s to dest=%s" % (n,src,dest))
     elif isinstance(n,list):
         intervals = n
         if verbose:
-            print "copying %d sets of bytes:" % len(intervals),
+            print("copying %d sets of bytes:" % len(intervals), end=' ')
         for interval in intervals:
             a,b = interval
             if b == 'end':
                 b = os.stat(src).st_size
                 interval[1] = b
             if verbose:
-                print " [%d,%d)" % (a,b),
+                print(" [%d,%d)" % (a,b), end=' ')
         if verbose:
-            print " from src=%s to dest=%s" % (src, dest)
+            print(" from src=%s to dest=%s" % (src, dest))
     inFile = io.open(src,'rb')
     if mode == 'truncate':
         outFile = io.open(dest,'wb')
@@ -1491,7 +1492,7 @@ def parseXtcFileName(xtc):
     return int(run[1:]), int(stream[1:]), int(chunk[1:])
 
 def getXtcDirsToScan(currentXtcDirList, previousXtcDirs):
-    print "going through %d xtc directories, checking xtc file modification times" % len(currentXtcDirList)
+    print("going through %d xtc directories, checking xtc file modification times" % len(currentXtcDirList))
     xtcDirsToScan = dict()
     for xtcDir in currentXtcDirList:
         xtcs = glob.glob(os.path.join(xtcDir,'*.xtc'))
@@ -1521,7 +1522,7 @@ def getXtcDirsToScan(currentXtcDirList, previousXtcDirs):
     return xtcDirsToScan
 
 def typesCommand(args):
-    print "*** types Command not fully implemented, do not run ***"
+    print("*** types Command not fully implemented, do not run ***")
     return
     dgrams = 40
     assert len(args) in [0,1,2], "must be 0, 1 or 2 args"
@@ -1540,24 +1541,24 @@ def typesCommand(args):
     xtcDirsToScan = getXtcDirsToScan(currentXtcDirList, previousXtcDirs)
     currentTypeVersions = getDataTestTypeVersions()
     
-    print "** Currently: %d typeid/versions" % len(currentTypeVersions)
-    print "** %d new xtc experiment directories to scan" % len(xtcDirsToScan)
+    print("** Currently: %d typeid/versions" % len(currentTypeVersions))
+    print("** %d new xtc experiment directories to scan" % len(xtcDirsToScan))
     filesToScan = []
     for xtcDir, xtcInfo in xtcDirsToScan.iteritems():
         filesToScan.extend(xtcInfo['xtcs'])
-    print "%d files to scan" % len(filesToScan)
+    print("%d files to scan" % len(filesToScan))
     random.shuffle(filesToScan)
     filesScanned = 0
     for xtc in filesToScan:
         typeVersions = getValidTypeVersions(xtc, dgrams)
         newTypeVers = typeVersions.difference(currentTypeVersions)
         if len(newTypeVers)>0:
-            print "Found %d new types (%s) in %s" % (len(newTypeVers), newTypeVers, xtc)
+            print("Found %d new types (%s) in %s" % (len(newTypeVers), newTypeVers, xtc))
 #            updateTestData(xtc,newTypeVers,dgrams)
             currentTypeVersions = currentTypeVersions.union(newTypeVers)
         filesScanned += 1
         if filesScanned % 50 == 0:
-            print "scanned %d of %d files" % (filesScanned, len(filesToScan))
+            print("scanned %d of %d files" % (filesScanned, len(filesToScan)))
     updatePrevXtcDirs(previousXtcDirsFileName, xtcDirsToScan)
 
 def makeRegressionTestFile(regressionTestFile = getRegressionTestFilename()):
@@ -1625,13 +1626,13 @@ cmdDict = {
            
 def main(args):
     if len(args)<2:
-        print usage
+        print(usage)
         sys.exit(0)
     cmd = args[1]
     validCmds = cmdDict.keys()
     if cmd not in validCmds:
-        print "ERROR: cmd '%s' is not recognized" % cmd
-        print usage
+        print("ERROR: cmd '%s' is not recognized" % cmd)
+        print(usage)
         sys.exit(1)
   
     fn = cmdDict[cmd]
