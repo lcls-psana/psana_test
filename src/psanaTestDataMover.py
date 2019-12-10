@@ -277,7 +277,7 @@ def dataMover(args):
 
     try:
         moveAllChunks(streamFtype2chunkCurrentProcess, stream2xtcFiles, args, lock)
-    except KeyboardInterrupt, kb:
+    except KeyboardInterrupt as kb:
         print("Killing current processes:")
         for timeProcess in streamFtype2chunkCurrentProcess.itervalues():
             t0, process = timeProcess

@@ -51,7 +51,7 @@ class PsanaModuleGetArrayPy(object):
             exceptionMsg = ''
             try:
                 const_arr[0,0]=234.0
-            except Exception,e:
+            except Exception as e:
                 exceptionMsg = str(e)
             if len(exceptionMsg)>0:
                 stdout.write("success: trying to write to const ndarray triggered exception: %s\n" % exceptionMsg)
@@ -62,7 +62,7 @@ class PsanaModuleGetArrayPy(object):
             try:
                 nonconst_arr[0,0]=234.0
                 stdout.write("success: writing to nonconst array worked fine\n")
-            except Exception,e:
+            except Exception as e:
                 stderr.write("ERROR: writing to nonconst array generated exception: %s\n" % str(e))
             
 

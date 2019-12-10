@@ -855,7 +855,7 @@ def testShmCommand(args):
         print("running server cmd in bkgnd")
         try:
             os.system(xtcservercmd)
-        except Exception,e:
+        except Exception as e:
             print("ERROR running server command.")
             if os.path.exists(expectedSharedMemoryFile):
                 print("deleteing shared memory server file: %s" % expectedSharedMemoryFile)
@@ -865,7 +865,7 @@ def testShmCommand(args):
         print("running dump cmd")
         try:
             dumpStdout,dumpError = cmdTimeOut(dumpcmd,30)
-        except Alarm, alarm:
+        except Alarm as alarm:
             print("ERROR: psana_test.dump command timed out: %s" % alarm)
             print("  run ps and clean up jobs")
             print("  try to run test again, or try to increase the message size ")

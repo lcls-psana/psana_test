@@ -156,7 +156,7 @@ rowIdx     timestampHigh, timestampLow, eventCode
                 sys.stdout = StringIO.StringIO()
                 try:
                     h5tools.printds(f[dsKey])
-                except Exception,e:
+                except Exception as e:
                     sys.stdout = origStdout
                     sys.stderr.write("h5tools printds call failed on ipimbConfig from h5py read\n")
                     raise e
