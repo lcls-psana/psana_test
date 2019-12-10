@@ -8,14 +8,14 @@ import numpy as np
 
 class dump(object):
     def __init__(self):
-        self.epicsParam = self.configBool('epics', True)        
+        self.epicsParam = self.configBool('epics', True)
         self.aliasesParam  = self.configBool('aliases', True)
         self.followEpicsAliases = self.configBool('dump_aliases',False)
         self.dumpSml = self.configBool('dump_sml',False)
         self.epicsPrintForRegressionTests = self.configBool('regress_dump',False)
         self.beginJobEvt = self.configBool('dump_beginjob_evt',True)
-        # if outputFile is set, all output will be written to that file, if 
-        # not in parallel mode, otherwise, that file + '.subproc_n' where n 
+        # if outputFile is set, all output will be written to that file, if
+        # not in parallel mode, otherwise, that file + '.subproc_n' where n
         # n is the subprocess number
         self.outputFile = self.configStr('output_file','')
         # set epics_update to 'regress' to update epics for regression tests.
@@ -29,7 +29,7 @@ class dump(object):
         self.headerParam = self.configBool('header',True)
         # how much to indent sub objects in the printout
         self.indent = self.configInt('indent',2)
-        # filter options for the keys found. a list of strings that 
+        # filter options for the keys found. a list of strings that
         # we will grep the type/src/key eventKey strings with - first
         # excluding the event key string (if exclude is not empty) and then
         # including the event key string (if include is not empty)
@@ -100,7 +100,7 @@ class dump(object):
         self.eventNumber += 1
         counterStr = ''
         if self.counterParam:
-            counterStr = 'run=%d step=%d event=%d' % (self.runNumber, 
+            counterStr = 'run=%d step=%d event=%d' % (self.runNumber,
                                                       self.calibNumber, self.eventNumber)
         eventId = evt.get(psana.EventId)
         sec,nsec = eventId.time()
@@ -134,7 +134,7 @@ class dump(object):
             self.fout.write('%s\n' % eventKeyStr)
             self.fout.write('%s\n' % objStr)
         self.fout.flush()
-            
+
     def dumpEvent(self, evt, env):
         keys = evt.keys()
         toPrint = []
@@ -157,16 +157,16 @@ class dump(object):
             if keyStr.find('SmlData.')>=0:
                 return True
         if len(self.exclude)>0:
-	    for term in self.exclude:
+            for term in self.exclude:
                 if keyStr.find(term)>=0:
                     return True
         if len(self.include)>0:
             for term in self.include:
-	        if keyStr.find(term)>=0:
+                if keyStr.find(term)>=0:
                     return False
             return True
         return False
-        
+
     def dumpEpics(self, evt, env):
         if not self.epicsParam:
             return
@@ -210,7 +210,7 @@ class dump(object):
                 self.fout.write( "%spvName=%s %s\n" % (indent, pvName, pvStr))
             previous[pvName]=pvCmpStr
         self.fout.flush()
-        
+
 
 ######## helper functions ############
 def getEventKeyStr(key, amap=None):

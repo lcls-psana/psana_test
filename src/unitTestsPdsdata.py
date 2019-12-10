@@ -2,7 +2,7 @@ from __future__ import print_function
 #--------------------------------------------------------------------------
 # Description:
 #   Test script for pdsdata
-#   
+#
 #------------------------------------------------------------------------
 
 
@@ -27,11 +27,11 @@ MULTIDATADIR = ptl.getMultiFileDataDir()
 class Pdsdata( unittest.TestCase ) :
 
     def setUp(self) :
-    	""" 
-    	Method called to prepare the test fixture. This is called immediately 
-    	before calling the test method; any exception raised by this method 
-    	will be considered an error rather than a test failure.  
-    	"""
+        """
+        Method called to prepare the test fixture. This is called immediately
+        before calling the test method; any exception raised by this method
+        will be considered an error rather than a test failure.
+        """
         assert os.path.exists(TESTDATADIR), "Data dir: %s does not exist, cannot run unit tests" % TESTDATADIR
         assert os.path.exists(MULTIDATADIR), "Data dir: %s does not exist, cannot run unit tests" % MULTIDATADIR
         self.outputDir = tempfile.mkdtemp()
@@ -40,20 +40,20 @@ class Pdsdata( unittest.TestCase ) :
 
     def tearDown(self) :
         """
-        Method called immediately after the test method has been called and 
-        the result recorded. This is called even if the test method raised 
-        an exception, so the implementation in subclasses may need to be 
-        particularly careful about checking internal state. Any exception raised 
-        by this method will be considered an error rather than a test failure. 
-        This method will only be called if the setUp() succeeds, regardless 
-        of the outcome of the test method. 
+        Method called immediately after the test method has been called and
+        the result recorded. This is called even if the test method raised
+        an exception, so the implementation in subclasses may need to be
+        particularly careful about checking internal state. Any exception raised
+        by this method will be considered an error rather than a test failure.
+        This method will only be called if the setUp() succeeds, regardless
+        of the outcome of the test method.
         """
         if self.cleanUp:
             shutil.rmtree(self.outputDir)
 
     def test_smlDataDamageContributed(self):
         '''
-        JIRA PSAS-237 - the contributed damage was 
+        JIRA PSAS-237 - the contributed damage was
         causing smldata problems
         '''
         testdir = os.path.join(MULTIDATADIR, 'test_030_amoc0113')
@@ -104,7 +104,7 @@ class Pdsdata( unittest.TestCase ) :
             pass
         lastTestTime = 0.0
         testsWithSameEventKeys = [0,2,13, 90]
-        testsWithDifferentEventKeys = [62,65,91]  # 90 and 91 are meck test files, 
+        testsWithDifferentEventKeys = [62,65,91]  # 90 and 91 are meck test files,
         tests2do = testsWithSameEventKeys + testsWithDifferentEventKeys
         # 91 is 90 but with damage added to a later dgram
         for xtc, smdbase in zip(xtcs, smdbases):

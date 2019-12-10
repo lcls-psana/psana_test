@@ -2,7 +2,7 @@ from __future__ import print_function
 #--------------------------------------------------------------------------
 # Description:
 #   Test script for psana_test
-#   
+#
 #------------------------------------------------------------------------
 
 
@@ -29,11 +29,11 @@ DATADIR = ptl.getTestDataDir()
 class LiveMode( unittest.TestCase ) :
 
     def setUp(self) :
-    	""" 
-    	Method called to prepare the test fixture. This is called immediately 
-    	before calling the test method; any exception raised by this method 
-    	will be considered an error rather than a test failure.  
-    	"""
+        """
+        Method called to prepare the test fixture. This is called immediately
+        before calling the test method; any exception raised by this method
+        will be considered an error rather than a test failure.
+        """
         assert os.path.exists(DATADIR), "Data dir: %s does not exist, cannot run unit tests" % DATADIR
         self.cleanUp = True    # delete intermediate files if True
         self.verbose = False    # print psana output, ect
@@ -67,7 +67,7 @@ class LiveMode( unittest.TestCase ) :
 
         self.moverCmdWithoutRate = 'psanaTestSmlDataMover -m %s -i %s -o %s -r %d' % \
                                    (mapfile, self.srcSmallDataDir, destSmallDataDir, self.run)
-        
+
         for fname in glob.glob(os.path.join(destSmallDataDir, '*')):
             os.unlink(fname)
 
@@ -75,13 +75,13 @@ class LiveMode( unittest.TestCase ) :
 
     def tearDown(self) :
         """
-        Method called immediately after the test method has been called and 
-        the result recorded. This is called even if the test method raised 
-        an exception, so the implementation in subclasses may need to be 
-        particularly careful about checking internal state. Any exception raised 
-        by this method will be considered an error rather than a test failure. 
-        This method will only be called if the setUp() succeeds, regardless 
-        of the outcome of the test method. 
+        Method called immediately after the test method has been called and
+        the result recorded. This is called even if the test method raised
+        an exception, so the implementation in subclasses may need to be
+        particularly careful about checking internal state. Any exception raised
+        by this method will be considered an error rather than a test failure.
+        This method will only be called if the setUp() succeeds, regardless
+        of the outcome of the test method.
         """
         pass
 
@@ -99,7 +99,7 @@ class LiveMode( unittest.TestCase ) :
             processed = 0
             delay = 0.009  # we should definitely fall behind and need to skip
             for evt in ds.events():
-                if liveAvail.toFarBehind(): 
+                if liveAvail.toFarBehind():
                     skipped += 1
                     continue
                 time.sleep(delay)
@@ -122,8 +122,8 @@ class LiveMode( unittest.TestCase ) :
                 evtId = evt.get(psana.EventId)
                 if evtId is not None:
                     deadEventTimes.append(str(evtId))
-            print("finished dead dset=%s in %.2f sec #events=%d" % (self.srcDataset, 
-                                                                     time.time()-t0, 
+            print("finished dead dset=%s in %.2f sec #events=%d" % (self.srcDataset,
+                                                                     time.time()-t0,
                                                                      len(deadEventTimes)))
 
             os.system("%s --hertz 500&" % self.moverCmdWithoutRate)
@@ -134,12 +134,12 @@ class LiveMode( unittest.TestCase ) :
                 evtId = evt.get(psana.EventId)
                 if evtId is not None:
                     liveEventTimes.append(str(evtId))
-            print("finished live: dset=%s in %.2f sec #events=%d" % (self.destDataset, 
-                                                                     time.time()-t0, 
+            print("finished live: dset=%s in %.2f sec #events=%d" % (self.destDataset,
+                                                                     time.time()-t0,
                                                                      len(liveEventTimes)))
 
 
-            self.assertEqual(len(liveEventTimes), len(deadEventTimes), 
+            self.assertEqual(len(liveEventTimes), len(deadEventTimes),
                              msg="live and dead event time lengths differ")
             for liveTm, deadTm in zip(liveEventTimes, deadEventTimes):
                 self.assertEqual(liveTm, deadTm)

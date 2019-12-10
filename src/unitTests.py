@@ -2,7 +2,7 @@ from __future__ import print_function
 #--------------------------------------------------------------------------
 # Description:
 #   Test script for psana_test
-#   
+#
 #------------------------------------------------------------------------
 
 
@@ -32,12 +32,12 @@ import multiprocessing
 DATADIR = ptl.getTestDataDir()
 
 #------------------
-# Utility functions 
+# Utility functions
 #------------------
 def getLinesBeforeAndAfterPos(string,pos,linesBefore,linesAfter):
-    '''returns the positions in the string for the newline 
+    '''returns the positions in the string for the newline
     characters that are linesBefore earlier in string from pos, and
-    linesAfter past pos in string 
+    linesAfter past pos in string
     '''
     linesBefore = min(1,linesBefore)
     linesAfter = min(1,linesAfter)
@@ -61,24 +61,24 @@ def getLinesBeforeAndAfterPos(string,pos,linesBefore,linesAfter):
 class Psana( unittest.TestCase ) :
 
     def setUp(self) :
-    	""" 
-    	Method called to prepare the test fixture. This is called immediately 
-    	before calling the test method; any exception raised by this method 
-    	will be considered an error rather than a test failure.  
-    	"""
+        """
+        Method called to prepare the test fixture. This is called immediately
+        before calling the test method; any exception raised by this method
+        will be considered an error rather than a test failure.
+        """
         assert os.path.exists(DATADIR), "Data dir: %s does not exist, cannot run unit tests" % DATADIR
         self.cleanUp = True    # delete intermediate files if True
         self.verbose = False    # print psana output, ect
 
     def tearDown(self) :
         """
-        Method called immediately after the test method has been called and 
-        the result recorded. This is called even if the test method raised 
-        an exception, so the implementation in subclasses may need to be 
-        particularly careful about checking internal state. Any exception raised 
-        by this method will be considered an error rather than a test failure. 
-        This method will only be called if the setUp() succeeds, regardless 
-        of the outcome of the test method. 
+        Method called immediately after the test method has been called and
+        the result recorded. This is called even if the test method raised
+        an exception, so the implementation in subclasses may need to be
+        particularly careful about checking internal state. Any exception raised
+        by this method will be considered an error rather than a test failure.
+        This method will only be called if the setUp() succeeds, regardless
+        of the outcome of the test method.
         """
         pass
 
@@ -95,7 +95,7 @@ class Psana( unittest.TestCase ) :
         cfgFileStr = ''
         if cfgfile is not None:
             cfgfile.flush()
-            cfgFileStr = '-c %s' % cfgfile.name        
+            cfgFileStr = '-c %s' % cfgfile.name
         psana_cmd = "psana %s %s" % (cmdLineOptions,cfgFileStr)
         p = sb.Popen(psana_cmd,shell=True,stdout=sb.PIPE, stderr=sb.PIPE)
         o,e = p.communicate()
@@ -132,7 +132,7 @@ class Psana( unittest.TestCase ) :
             fin = file(inFile,'r')
         except:
             self.assertTrue(False,msg="test data exists, but this program cannot read it")
-        fin.close()        
+        fin.close()
         self.assertTrue(os.path.exists(os.path.split(outFile)[0]),msg="output directory does not exist")
         try:
             fout = file(outFile,'w')
@@ -188,10 +188,10 @@ class Psana( unittest.TestCase ) :
             self.assertEqual(id.time()[1], expectNsec[1], msg="incorrect nanoseconds from calibcycle-indexing. found %d, expect %d" % (id.time()[1],expectNsec[1]))
 
     def test_MoreRecentEpicsStored(self):
-        '''When the same epics pv is recorded from several sources, or several times in the same source, 
+        '''When the same epics pv is recorded from several sources, or several times in the same source,
         the most recent one should be stored. test_073 is a case where this occurs, and before the code
         was changed to add the most recent one, it was the earlier one that was stored.
-        The earlier one, from pvid 192, has stamp.sec=767233751 stamp.nsec= 40108031 
+        The earlier one, from pvid 192, has stamp.sec=767233751 stamp.nsec= 40108031
         while the later one, from pvid 9    stamp.sec=767233751 stamp.nsec=140115967
         '''
         TEST_73 = os.path.join(DATADIR,'test_073_cxi_cxid5514_e423-r0049-s00-c00.xtc')
@@ -208,10 +208,10 @@ class Psana( unittest.TestCase ) :
 
     def test_EpicsIssues1(self):
         '''Test a number of issues:
-        * That a epics pv that is accidentally masked by an alias is accessible. 
-          In the test file, test_010, there is an alias CXI:SC2:MZM:09:ENCPOSITIONGET that masks that pv. 
+        * That a epics pv that is accidentally masked by an alias is accessible.
+          In the test file, test_010, there is an alias CXI:SC2:MZM:09:ENCPOSITIONGET that masks that pv.
           Check that the pv is accessible.
-        * For hdf5 input, pv's with the same pvid from different sources are read back 
+        * For hdf5 input, pv's with the same pvid from different sources are read back
           properly.
         * For hdf5 input, pv's with the same pvid from different sources cannot both have aliases
           (this is a current limitation) test that only one alias is available. If this limitiation is
@@ -231,7 +231,7 @@ class Psana( unittest.TestCase ) :
                     aliasPv = estore.getPV(alias)
                     pv = estore.getPV(pvname)
                     if aliasPv is not None:
-                        self.assertFalse(pv is None, 
+                        self.assertFalse(pv is None,
                                          msg="%s: source=%s\n can only get pv: %s through alias: %s" % (label, source, pvname, alias))
                         aliasStr = epicsPvToStr(aliasPv)
                         pvStr = epicsPvToStr(pv)
@@ -280,13 +280,13 @@ class Psana( unittest.TestCase ) :
             self.h5Translate(TEST_10, h5_outfile, cmdLineOptions='-n 1')
 
             # this is the pv that is masked by an alias
-            src1_pvid_4 = {'pvname':'CXI:SC2:MZM:09:ENCPOSITIONGET', 
+            src1_pvid_4 = {'pvname':'CXI:SC2:MZM:09:ENCPOSITIONGET',
                            'beginJobValue':0.0,
                            'event0value':0.0,
                            'event0stamp':(743137317, 444140000),
                            'alias':'KB1 Vert Foucssing Mirror Pitch-CXI:SC2:MZM:09:ENCPOSITIONGET'}
             # this is a different pv from a different source that has the same pvid
-            src0_pvid_4 = {'pvname':'CXI:DG3:PIC:01.RBV', 
+            src0_pvid_4 = {'pvname':'CXI:DG3:PIC:01.RBV',
                            'beginJobValue':1.0005e-02,
                            'event0value':1.0005e-02,
                            'event0stamp':(742173122, 724943000),
@@ -346,7 +346,7 @@ class Psana( unittest.TestCase ) :
             del dsXtc
 
             psana.setConfigFile('')
-            dsH5 = psana.DataSource(h5_outfile) 
+            dsH5 = psana.DataSource(h5_outfile)
             estore = dsH5.env().epicsStore()
             # check expected number of aliases and pvNames, have not verified that they are all correct, 193 and 227
             # are what was observed when test was written
@@ -382,7 +382,7 @@ class Psana( unittest.TestCase ) :
 
 
     def test_s80merge(self):
-        '''tests if the s80 stream is merged properly        
+        '''tests if the s80 stream is merged properly
         '''
         DAQ_fiducials_with_matching_s80 = [0x0DAE5,   # s0
                                            0x0DAFD,   # s0
@@ -413,7 +413,7 @@ class Psana( unittest.TestCase ) :
             if evt.get(psana.Camera.FrameV1, orca)  is None: return False
             if evt.get(psana.Camera.FrameV1, xtcav) is None: return False
             return True
-            
+
         def eventHasOnlyDaq(evt, opal0, opal1, opal2, orca, xtcav):
             if evt.get(psana.Camera.FrameV1, opal0) is None: return False
             if evt.get(psana.Camera.FrameV1, opal1) is None: return False
@@ -421,7 +421,7 @@ class Psana( unittest.TestCase ) :
             if evt.get(psana.Camera.FrameV1, orca) is None: return False
             if evt.get(psana.Camera.FrameV1, xtcav) is not None: return False
             return True
-            
+
         def eventHasOnlyS80(evt, opal0, opal1, opal2, orca, xtcav):
             if evt.get(psana.Camera.FrameV1, opal0) is not None: return False
             if evt.get(psana.Camera.FrameV1, opal1) is not None: return False
@@ -458,13 +458,13 @@ class Psana( unittest.TestCase ) :
                 elif fid in s80_fiducials_with_no_DAQ:
                     self.assertTrue(eventHasOnlyS80(evt, opal0, opal1, opal2, orca, xtcav),
                                     "fid=%s should have only s80" % fid)
-            self.assertTrue((calibNumber,eventNumber) in [(0,16), (1,8)], 
+            self.assertTrue((calibNumber,eventNumber) in [(0,16), (1,8)],
                             msg="should be 16 events in calib 0, and 8 in calib 1")
 
     @unittest.skip("psana multi process parallel mode is not used anymore, resource heavy test")
     def test_mp(self):
         '''parallel child process mode
-        
+
         For testing, I'll just run one process with psana_test.dump to get all the
         output in one file. For some reason, I frequently get the error message
 
@@ -472,7 +472,7 @@ class Psana( unittest.TestCase ) :
 
         when I run psana_test.dump in parallel mode. Something flakely about the piping.
         If often seems that I don't get the error message if I run with debug output.
-        
+
         So to test, I'm running with debug output, and saving the dump into a separate
         file that I compare.
         '''
@@ -495,7 +495,7 @@ class Psana( unittest.TestCase ) :
             failMsg += cmd
             self.assertEqual(prev_md5, md5, msg=failMsg)
             os.unlink(dumpOutput)
-        
+
             # test that mp mode is the same as not mp mode (DAQ only streams)
             dumpOutput = outdir.fullpath('unittest_test_mp_normal.dump')
             cmd = '''psana -c '' -o psana_test.dump.output_file=%s''' % dumpOutput
@@ -543,7 +543,7 @@ class Psana( unittest.TestCase ) :
 
             def __repr__(self):
                 return 'sec=%d nsec=%d fid=%d' % (self.sec, self.nsec, self.fid)
-    
+
         def psanaEventIdToStr(eventId):
             return 'sec=%d nsec=%d fid=%d' % (eventId.time()[0], eventId.time()[1], eventId.fiducials())
 
@@ -554,7 +554,7 @@ class Psana( unittest.TestCase ) :
         eventTimes.append(EventTime(sec=1399774519, nsec=890170627, fid=11520))
         eventTimes.append(EventTime(sec=1399774523, nsec=339827189, fid=12762))
         eventTimes.append(EventTime(sec=1399774526, nsec=630896109, fid=13947))
-        
+
         psana.setOption("PSXtcInput.XtcInputModule.third_event_jump_offsets",ccOffsetsOption)
         psana.setOption("PSXtcInput.XtcInputModule.third_event_jump_filenames",ccFilenamesOption)
 
@@ -567,7 +567,7 @@ class Psana( unittest.TestCase ) :
             failMsg = "Fail: data=%s\n      test=%s\n     first=%s" % \
                 (psanaEventIdToStr(evtTime),evtTestTime, firstTime)
             self.assertTrue(evtTestTime == evtTime, msg=failMsg)
-                
+
         # psana remembers options. If another unit test function is run after this one
         # the jump parameters will still be in effect. Set them to null.
         psana.setOption("PSXtcInput.XtcInputModule.third_event_jump_offsets",'')
@@ -590,7 +590,7 @@ class Psana( unittest.TestCase ) :
         self.assertIsNotNone(cfgStore.get(psana.ControlData.ConfigV2,psana.Source('ProcInfo()')))
         self.assertIsNotNone(cfgStore.get(psana.Ipimb.ConfigV2,psana.Source("BldInfo(XppSb2_Ipm)")))
 
-        # mismatches, 
+        # mismatches,
         self.assertIsNone(cfgStore.get(psana.ControlData.ConfigV2, psana.Source('DetInfo(NoDetector.0:Evr.1)')))
         self.assertIsNone(cfgStore.get(psana.ControlData.ConfigV2,"mykey"))
         self.assertIsNone(cfgStore.get(psana.Ipimb.ConfigV2,psana.Source('ProcInfo()')))
@@ -645,7 +645,7 @@ class Psana( unittest.TestCase ) :
         psana.setOption('modules','Translator.TestModuleNDArrayString psana_test.PsanaModulePutStr psana_test.PsanaModuleGetStr')
         ds = psana.DataSource(TEST_42)
         evt = next(ds.events())
-        # if we got this far, then the psana_test.PsanaModuleGetStr C++ module got the 
+        # if we got this far, then the psana_test.PsanaModuleGetStr C++ module got the
         # string from the Python module psana_test.PsanaModulePutStr.
         # So Python -> C++ is working.
         # Now we test C++ -> Python. The C++ module Translator.TestModuleNDArrayString
@@ -658,10 +658,10 @@ class Psana( unittest.TestCase ) :
         evt.put('testing string','testkey')
         testStr = evt.get(str,'testkey')
         self.assertEqual(testStr,'testing string', msg="testStr does not have expected value")
-        
+
     @unittest.skip("sometimes fails on rel7 JIRA PSAS-177")
     def testLiveMode(self):
-        '''Test that live mode works works. In particular, we are concerned about 
+        '''Test that live mode works works. In particular, we are concerned about
         merging with control streams. Tests:
 
           delay s80, then it catches up with the DAQ streams
@@ -690,10 +690,10 @@ class Psana( unittest.TestCase ) :
         offlineCmd = 'psana -m psana_examples.DumpDgram '
         offlineCmd += 'exp=%s:run=%d:dir=%s' % (expname, run, srcDir)
         offlineCmd += ' >%s 2>%s' %(offlineStdoutFilename, offlineStderrFilename)
-        
+
         # get ground truth for what we should see:
         os.system(offlineCmd)
-        
+
         # make sure no errors (strip out warnings, we expect the warning: PSXtcInput.XtcInputModule smallDataProxy typeid found but smallDataProxy is null.
         offlineStderr = file(offlineStderrFilename,'r').read().strip()
         offlineStderr = '\n'.join([ln for ln in offlineStderr.split('\n') if not ln.startswith('[warning')])
@@ -702,7 +702,7 @@ class Psana( unittest.TestCase ) :
         # below is the md5sum of what we expect above
         md5sum_offline_mode = '8cc65ac5deeafaeb0316a5e841d9d414'
         new_md5sum_offline = ptl.get_md5sum(offlineStdoutFilename)
-        self.assertEqual(md5sum_offline_mode, new_md5sum_offline, 
+        self.assertEqual(md5sum_offline_mode, new_md5sum_offline,
                          msg="output of DumpDgram has changed. Check output of cmd=%s, edit test with new md5sum if neccessary" % offlineCmd)
 
         ##### - helper function to do live mode comparison - #######
@@ -716,16 +716,16 @@ class Psana( unittest.TestCase ) :
 
             liveModeArgs = ['.inprogress',
                             run,
-                            srcDir, 
-                            destDir, 
-                            initialDelays, 
-                            mb_per_writes, 
+                            srcDir,
+                            destDir,
+                            initialDelays,
+                            mb_per_writes,
                             '0-255:-1',  # read everything
                             delays_between_writes,
                             True,   # force overwrite
                             False]  # verbose, set this to True when debugging to see how files written
             liveModeProcess = multiprocessing.Process(target=liveModeLib.simLiveMode, args=liveModeArgs)
-        
+
             dumpStdOutFile = os.path.join(destDir, "livemode-%s.stdout" % testlabel)
             dumpStdErrFile = os.path.join(destDir, "livemode-%s.stderr" % testlabel)
             assert not os.path.exists(dumpStdOutFile), "unexpected, dump file exists in new random dir. filename=%s" % dumpStdOutFile
@@ -737,8 +737,8 @@ class Psana( unittest.TestCase ) :
             liveModeProcess.start()
             os.system(dumpCmd)
             liveModeProcess.join()
-        
-            # we're done. 
+
+            # we're done.
             # we expect warnings about finding the smallDataProxy typeid, but not having a small data proxy
             # object. Remove all warnings and Check for unexpected error output:
             liveDumpStderr = file(dumpStdErrFile,'r').read().strip()
@@ -749,12 +749,12 @@ class Psana( unittest.TestCase ) :
             # live mode should be mention of the .inprogress files. If we subsititute that
             # back, it should look just like the offline output. We want to check that a lot
             # of datagrams show up from the inprogress files:
-        
+
             seeInProgressCmd = '''grep '.xtc.inprogress' %s | wc''' % dumpStdOutFile
             inProgressStdout, inProgressStderr = ptl.cmdTimeOut(seeInProgressCmd)
             numberLines = int(inProgressStdout.split()[0])
             expected = 10
-            self.assertGreaterEqual(numberLines, expected, 
+            self.assertGreaterEqual(numberLines, expected,
                                     msg="expected at least %d lines with .xtc.inprogress in DumpDamage output, but only found %d\ngrep cmd was:\n%s" % (expected, numberLines, seeInProgressCmd))
 
             # replace .xtc.inprogress with .xtc so we can compare output
@@ -762,7 +762,7 @@ class Psana( unittest.TestCase ) :
             cmd = '''sed 's/\.xtc\.inprogress/\.xtc/' %s >%s''' % (dumpStdOutFile, replacedStdOutFile)
             os.system(cmd)
             md5replaced = ptl.get_md5sum(replacedStdOutFile)
-            self.assertEqual(md5replaced, md5sum_offline_mode, 
+            self.assertEqual(md5replaced, md5sum_offline_mode,
                              msg="md5 of DumpDgram output with .xtc.inprogress replaced with .xtc is not equal to offline result.\n sed replace cmd:\n%s\n Compare files:\nlive mode=%s\noffline=%s" % \
                              (cmd, replacedStdOutFile, offlineStdoutFile))
         ##### -- end helper function -- ###
@@ -771,7 +771,7 @@ class Psana( unittest.TestCase ) :
         testLiveModeHelper(self,
                            'delay_s80_then_catchup',
                            srcDir, destDir, run,
-                           md5sum_offline_mode, 
+                           md5sum_offline_mode,
                            daqInitialDelay = 0.3,
                            s80InitialDelay = 1.2,
                            mbPerWrites = .05,
@@ -785,7 +785,7 @@ class Psana( unittest.TestCase ) :
         testLiveModeHelper(self,
                            'delay_DAQ_then_catchup',
                            srcDir, destDir, run,
-                           md5sum_offline_mode, 
+                           md5sum_offline_mode,
                            daqInitialDelay = 1.2,
                            s80InitialDelay = .3,
                            mbPerWrites = .05,
@@ -807,17 +807,17 @@ class Psana( unittest.TestCase ) :
             acq = evt.get(psana.Acqiris.DataDescV1, src)
             if acq is None: continue
             self.assertRaises(IndexError, acq.data,4)
-                
+
 
     @unittest.skip("complicated test - skip for now. JIRA PSAS-182")
     def testLiveModeConsistantEventOrder(self):
         '''make sure that live mode always reads through events in the same order.
         print event id's on inprogress files, and complete files and compare.
-        '''        
+        '''
         ##### helper functions
         def copyTestDataToNewStagingLocation(params):
-            destDirBase = ptl.getDataArchDir(pkg='psana_test', 
-                                             datasubdir='test_output', 
+            destDirBase = ptl.getDataArchDir(pkg='psana_test',
+                                             datasubdir='test_output',
                                              archsubdir='liveModeSim')
             destDir = tempfile.mkdtemp(dir=destDirBase, prefix='tmpStaging_')
             srcDir = os.path.join(ptl.getMultiFileDataDir(), 'test_009_%s' % params.expname)
@@ -858,8 +858,8 @@ class Psana( unittest.TestCase ) :
                 writeDgramHeaders(xtc, L1AcceptDgramOffsets, headers)
 
         def startSlowishDataMover(params, stagingDir):
-            destDirBase = ptl.getDataArchDir(pkg='psana_test', 
-                                             datasubdir='test_output', 
+            destDirBase = ptl.getDataArchDir(pkg='psana_test',
+                                             datasubdir='test_output',
                                              archsubdir='liveModeSim')
             inProgressDir = tempfile.mkdtemp(dir=destDirBase, prefix='tmpInProgress_')
             os.mkdir(os.path.join(inProgressDir, 'smalldata'))
@@ -881,7 +881,7 @@ class Psana( unittest.TestCase ) :
                    (params.expname, params.run, inProgressDir, liveStr[livemode])
             cmd += ' 2>&1 | grep -v warning > %s' % outputfile
             return cmd
-            
+
         def readEventIdsFromLiveInProgress(params, inProgressDir):
             time.sleep(3)
             finishedFiles = glob.glob(os.path.join(inProgressDir, '*.xtc'))
@@ -890,7 +890,7 @@ class Psana( unittest.TestCase ) :
             assert len(inProgressFiles)>0
             if params.verboseMover:
                 print("Before starting psana on inprogress:\n%s" % ptl.cmdTimeOut("ls -lrth %s" % inProgressDir)[0])
-            
+
             eventIdsOut = os.path.join(inProgressDir, "eventid.inprogress.output")
             cmd = eventIdCmd(params, inProgressDir, eventIdsOut, livemode=True)
             if params.verboseMover:
@@ -934,7 +934,7 @@ class Psana( unittest.TestCase ) :
         shutil.rmtree(inProgressDir)
 
 
-        
+
 if __name__ == "__main__":
     unittest.main(argv=[sys.argv[0], '-v'])
 

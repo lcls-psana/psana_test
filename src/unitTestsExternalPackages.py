@@ -2,7 +2,7 @@ from __future__ import print_function
 #--------------------------------------------------------------------------
 # Description:
 #   unit tests for external packages
-#   
+#
 #------------------------------------------------------------------------
 
 
@@ -19,7 +19,7 @@ from psana_test.TestOutputDir import outputDir
 DATADIR = "/reg/g/psdm/data_test/Translator"
 
 #------------------
-# Utility functions 
+# Utility functions
 #------------------
 #-------------------------------
 #  Unit test class definition --
@@ -27,24 +27,24 @@ DATADIR = "/reg/g/psdm/data_test/Translator"
 class ExtPkg( unittest.TestCase ) :
 
     def setUp(self) :
-    	""" 
-    	Method called to prepare the test fixture. This is called immediately 
-    	before calling the test method; any exception raised by this method 
-    	will be considered an error rather than a test failure.  
-    	"""
+        """
+        Method called to prepare the test fixture. This is called immediately
+        before calling the test method; any exception raised by this method
+        will be considered an error rather than a test failure.
+        """
         assert os.path.exists(DATADIR), "Data dir: %s does not exist, cannot run unit tests" % DATADIR
         self.cleanUp = True    # delete intermediate files if True
         self.verbose = False    # print psana output, ect
 
     def tearDown(self) :
         """
-        Method called immediately after the test method has been called and 
-        the result recorded. This is called even if the test method raised 
-        an exception, so the implementation in subclasses may need to be 
-        particularly careful about checking internal state. Any exception raised 
-        by this method will be considered an error rather than a test failure. 
-        This method will only be called if the setUp() succeeds, regardless 
-        of the outcome of the test method. 
+        Method called immediately after the test method has been called and
+        the result recorded. This is called even if the test method raised
+        an exception, so the implementation in subclasses may need to be
+        particularly careful about checking internal state. Any exception raised
+        by this method will be considered an error rather than a test failure.
+        This method will only be called if the setUp() succeeds, regardless
+        of the outcome of the test method.
         """
         pass
 
@@ -60,7 +60,7 @@ class ExtPkg( unittest.TestCase ) :
     @unittest.skip("fails in conda build, maybe the IOString thing to capture stdout?")
     def test_h5py(self):
         '''
-        We test h5py by looking at the output of h5tools on 
+        We test h5py by looking at the output of h5tools on
         two complicated datasets. In particular we look at
         datasets with vlen objects in it. It is important to test
         h5py on our vlen data to see if we still need the patch we
@@ -139,7 +139,7 @@ rowIdx pulseId polarity prescale  delay  width
                                             entries (vlen)
  sync_source beam_source length cycles    delay, eventcode
         enum        enum uint32 uint32   uint32,    uint32
-     Disable     Disable      0      0                    
+     Disable     Disable      0      0
 '''
             expectedOutputs['Configure:0000/Run:0000/CalibCycle:0000/EvrData::DataV3/NoDetector.0:Evr.0/data']='''
                                 fifoEvents (vlen)
@@ -195,7 +195,7 @@ rowIdx     timestampHigh, timestampLow, eventCode
             self.assertEqual(df_hdf['Births'].max(),973,msg="after write/read to hdf5, births max is not 973")
             if self.cleanUp:
                 os.unlink(outfile)
-        
+
     @unittest.skip("with conda, don't want to tie tables to psana-conda package")
     def test_pytables(self):
         #### test that we can import tables  - however packages already imported can affect success
@@ -207,7 +207,7 @@ rowIdx     timestampHigh, timestampLow, eventCode
         except ImportError:
             self.assertTrue(successfulImport,msg="Failed to import tables (pytables)")
         import numpy as np
-        
+
         # do some of the pytables 3.1.1 tutorial, this is from
         # http://pytables.github.io/usersguide/tutorials.html
         class Particle(tables.IsDescription):
