@@ -18,6 +18,7 @@ import shutil
 import signal
 import time
 import ctypes
+import six
 import xml.etree.ElementTree as ET
 from psana_test.TestOutputDir import outputDir
 
@@ -112,6 +113,9 @@ def cmdTimeOutWithReturnCode(cmd,seconds=5*60):
         signal.alarm(0)  # reset the alarm
     except Alarm:
         raise Alarm("cmd: %s\n took more than %d seconds" % (cmd, seconds))
+    if six.PY3:
+      o = o.decode()
+      e = e.decode()
     e = [ln for ln in e.split('\n') if len(ln.strip())>0]
     return o, '\n'.join(e), p.returncode
     
@@ -322,7 +326,10 @@ def psanaDump(inDataset, outfile, events=None, dumpEpicsAliases=False, regressDu
     if verbose: print(cmd)
     p = sb.Popen(cmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
     out,err = p.communicate()
-    fout = file(outfile,'w')
+    if six.PY3:
+      out = out.decode()
+      err = err.decode()
+    fout = open(outfile,'w')
     fout.write(out)
     fout.close()
     errLines = [ln for ln in err.split('\n') if len(ln.strip())>0]
@@ -534,7 +541,7 @@ def previousCommand(args):
 def previousDumpFile(deleteDump=True, doall=False):
     prevFullName = getPreviousDumpFilename()
     if doall:
-        fout = file(prevFullName,'w')
+        fout = open(prevFullName,'w')
         prevXtc = set()
         prevMulti = set()
     else:
@@ -542,7 +549,7 @@ def previousDumpFile(deleteDump=True, doall=False):
         prevXtcDict, prevMultiDict = readPrevious()
         prevXtc = prevXtcDict.keys()
         prevMulti = prevMultiDict.keys()
-        fout = file(prevFullName,'a')
+        fout = open(prevFullName,'a')
     testTimes = {'xtc':{}, 'multi':{}}
     regressTests = readRegressionTestFile()
     print("** prev: carrying out md5 sum of xtc, psana_test.dump of xtc and regression tests.")
@@ -721,7 +728,7 @@ def readPrevious():
     assert os.path.exists(prevFilename), "file %s doesn't exist, run prev command" % prevFilename
     xtcRes = {}
     multiRes = {}
-    for ln in file(prevFilename).read().split('\n'):
+    for ln in open(prevFilename).read().split('\n'):
         if not ln.startswith('xtc_md5sum='):
             continue
         if ln.find(' xtc=') >=0:
@@ -872,9 +879,9 @@ def testShmCommand(args):
             print("  from 10 to 32 before running this test with the command: ")
             print("  sudo /sbin/sysctl -w fs.mqueue.msg_max=32")
             print("===== xtcserver cmd stderr =======")
-            print(file(xtcserverCmdStderr).read())
+            print(open(xtcserverCmdStderr).read())
             print("===== xtcserver cmd stdout ======")
-            print(file(xtcserverCmdStdout).read())
+            print(open(xtcserverCmdStdout).read())
             if os.path.exists(expectedSharedMemoryFile):
                 print("deleteing shared memory server file: %s" % expectedSharedMemoryFile)
                 os.unlink(expectedSharedMemoryFile)
@@ -1436,7 +1443,7 @@ def copyBytes(src, n, dest, mode='truncate', verbose=True):
 
 def updatePrevXtcDirs(previousXtcDirsFileName,  xtcDirsToScan):
     # read comments from previous
-    comments = '\n'.join([ln for ln in file(previousXtcDirsFileName).read().split('\n') if ln.strip().startswith('#')])
+    comments = '\n'.join([ln for ln in open(previousXtcDirsFileName).read().split('\n') if ln.strip().startswith('#')])
     previousXtcDirs = readPreviousXtcDirs(previousXtcDirsFileName)
     currentXtcDirs = previousXtcDirs
     for scannedXtcDir, scanInfo in xtcDirsToScan.iteritems():
@@ -1450,7 +1457,7 @@ def updatePrevXtcDirs(previousXtcDirsFileName,  xtcDirsToScan):
         n += 1
         backup = '%s.%3.3d' % (previousXtcDirsFileName,n)
     shutil.copyfile(previousXtcDirsFileName, backup)
-    current = file(previousXtcDirsFileName,'w')
+    current = open(previousXtcDirsFileName,'w')
     current.write(comments)
     current.write('\n\n')
     for timeStamp, xtcDir in timeStampsXtcDirs:
@@ -1460,7 +1467,7 @@ def updatePrevXtcDirs(previousXtcDirsFileName,  xtcDirsToScan):
 def readPreviousXtcDirs(fname):
     assert os.path.exists(fname), \
         "previous xtc directories scanned file: %s does not exist" % fname
-    lines = [ln.strip() for ln in file(fname).read().split('\n') \
+    lines = [ln.strip() for ln in open(fname).read().split('\n') \
              if len(ln.strip())>0 and ln.strip()[0] != '#']
     previousXtcDirs = dict()
     for ln in lines:
@@ -1579,7 +1586,7 @@ def makeRegressionTestFile(regressionTestFile = getRegressionTestFilename()):
                     doneSet.add(typeId)
     if os.path.exists(regressionTestFile):
         sys.stderr.write("WARNING: overwriting: %s\n" % regressionTestFile)
-    fout = file(regressionTestFile,'w')
+    fout = open(regressionTestFile,'w')
     testNumbers = testFiles.keys()
     testNumbers.sort()
     for num in testNumbers:
@@ -1592,7 +1599,7 @@ def makeRegressionTestFile(regressionTestFile = getRegressionTestFilename()):
 
 def readRegressionTestFile(regressionTestFile = getRegressionTestFilename()):
     assert os.path.exists(getRegressionTestFilename()), "regression file %s does not exist. Run types regress" % getRegressionTestFilename()
-    fin = file(regressionTestFile)
+    fin = open(regressionTestFile)
     regressTests = {'xtc':{},'multi':{}}
     for ln in fin:
         ln = ln.strip()
