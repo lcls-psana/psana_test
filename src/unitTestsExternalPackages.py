@@ -9,9 +9,11 @@ from __future__ import print_function
 #--------------------------------
 #  Imports of standard modules --
 #--------------------------------
+from future import standard_library
+standard_library.install_aliases()
 import sys
 import os
-import StringIO
+import io
 import unittest
 import psana_test.psanaTestLib as ptl
 from psana_test.TestOutputDir import outputDir
@@ -150,10 +152,10 @@ rowIdx     timestampHigh, timestampLow, eventCode
 '''
             f=h5py.File(outfile)
 
-            for dsKey, expectedOutput in expectedOutputs.iteritems():
+            for dsKey, expectedOutput in expectedOutputs.items():
                 print("\n\n*****Made it!*******")
                 origStdout = sys.stdout
-                sys.stdout = StringIO.StringIO()
+                sys.stdout = io.StringIO()
                 try:
                     h5tools.printds(f[dsKey])
                 except Exception as e:
@@ -182,7 +184,7 @@ rowIdx     timestampHigh, timestampLow, eventCode
         # from the pandas tutorial
         names = ['Bob','Jessica','Mary','John','Mel']
         births = [968, 155, 77, 578, 973]
-        BabyDataSet = zip(names,births)
+        BabyDataSet = list(zip(names,births))
         df = pd.DataFrame(data = BabyDataSet, columns=['Names', 'Births'])
         self.assertEqual(df['Births'].max(),973,msg="births max is not 973")
         with outputDir('psext') as outdir:
@@ -226,7 +228,7 @@ rowIdx     timestampHigh, timestampLow, eventCode
             group = h5file.create_group("/", 'detector', 'Detector information')
             table = h5file.create_table(group, 'readout', Particle, "Readout example")
             particle = table.row
-            for i in xrange(10):
+            for i in range(10):
                 particle['name']  = 'Particle: %6d' % (i)
                 particle['TDCcount'] = i % 256
                 particle['ADCcount'] = (i * 256) % (1 << 16)

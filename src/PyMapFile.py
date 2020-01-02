@@ -22,7 +22,7 @@ class MapFile(object):
 
         fname2offset = getDgramInfo(evt)
 
-        for fname, offset in fname2offset.iteritems():
+        for fname, offset in fname2offset.items():
             stream, chunk = xtcFileNameStreamChunk(fname)
             curChunk, curOffset = self.stream2pos[stream]
             if chunk == curChunk:
@@ -31,7 +31,7 @@ class MapFile(object):
                 self.stream2pos[stream] = (chunk, offset)
         
         ln = 'evt= %10d' % self._eventNumber
-        streams = self.stream2pos.keys()
+        streams = list(self.stream2pos.keys())
         streams.sort()
         for stream in streams:
             chunk, offset = self.stream2pos[stream]

@@ -225,8 +225,8 @@ class Psana( unittest.TestCase ) :
         TEST_10 = os.path.join(DATADIR,'test_010_cxi_cxia4113_e325-r0002-s00-c00.xtc')
 
         def checkAliases(self, aliases, estore, label):
-            for source, aliasDict in aliases.iteritems():
-                for alias, pvnamePvIdPair in aliasDict.iteritems():
+            for source, aliasDict in aliases.items():
+                for alias, pvnamePvIdPair in aliasDict.items():
                     pvname,pvId = pvnamePvIdPair
                     aliasPv = estore.getPV(alias)
                     pv = estore.getPV(pvname)

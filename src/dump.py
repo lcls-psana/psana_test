@@ -117,7 +117,7 @@ class dump(object):
     def dumpConfig(self, evt, env):
         if not self.configParam:
             return
-        keys = env.configStore().keys()
+        keys = list(env.configStore().keys())
         toPrint = []
         for key in keys:
             objStr = getEventObjectStr(evt, env, key, inEvent=False, indent=self.indent)
@@ -136,7 +136,7 @@ class dump(object):
         self.fout.flush()
 
     def dumpEvent(self, evt, env):
-        keys = evt.keys()
+        keys = list(evt.keys())
         toPrint = []
         for key in keys:
             objStr = getEventObjectStr(evt, env, key, inEvent=True, indent=self.indent)

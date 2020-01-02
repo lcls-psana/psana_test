@@ -1,4 +1,5 @@
 from __future__ import print_function
+from past.builtins import execfile
 import os
 import sys
 import glob
@@ -109,8 +110,8 @@ def indexStreams(runFiles):
     assert numberOfSmallData == 0 or numberOfSmallData == len(runFiles), "There are %d small data files for the %d run files" % \
         (numberOfSmallData, len(runFiles))
     stream2xtcs = {}
-    for stream, chunk2xtc in stream2chunk2xtc.iteritems():
-        chunks = chunk2xtc.keys()
+    for stream, chunk2xtc in stream2chunk2xtc.items():
+        chunks = list(chunk2xtc.keys())
         chunks.sort()
         xtcSmallList = [chunk2xtc[chunk] for chunk in chunks]
         stream2xtcs[stream] = {'xtc':[el[0] for el in xtcSmallList],
@@ -158,7 +159,7 @@ def getMoverParams(args, streams):
     if moverParams['mb_read_xtc'] == 0.0:
         moverParams['mb_read_xtc'] = 4.0
 
-    for key in configLocals.iterkeys():
+    for key in configLocals.keys():
         sys.stderr.write("WARNING: unknown key %s in config" % key, args.config)
 
     return moverParams
@@ -186,7 +187,7 @@ def computeDefaultSmallDataRead(xtcRead, xtcFiles, smallFiles):
 def getAllFiles(stream2xtcFiles):
     xtcFiles = []
     smallFiles = []
-    for stream, xtcSmallFiles in stream2xtcFiles.iteritems():
+    for stream, xtcSmallFiles in stream2xtcFiles.items():
         xtcFiles.extend(xtcSmallFiles['xtc'])
         smallFiles.extend(xtcSmallFiles['smalldata'])
     return xtcFiles, smallFiles
@@ -215,7 +216,7 @@ def moveAllChunks(streamFtype2chunkCurrentProcess, stream2xtcFiles, args, lock):
         stillMoving = False
         doneKeys = []
         newProcesses = {}        
-        for key, startTimeProcess in streamFtype2chunkCurrentProcess.iteritems():
+        for key, startTimeProcess in streamFtype2chunkCurrentProcess.items():
             stream = int(key.split('_')[-1])
             ftype = key.split('_')[0]
             t0, process = startTimeProcess
@@ -243,14 +244,14 @@ def moveAllChunks(streamFtype2chunkCurrentProcess, stream2xtcFiles, args, lock):
             break
         for key in doneKeys:
             del streamFtype2chunkCurrentProcess[key]
-        for key, newProcess in newProcesses.iteritems():
+        for key, newProcess in newProcesses.items():
             streamFtype2chunkCurrentProcess[key]=(time.time(), newProcess)
             newProcess.start()
 
 def dataMover(args):
     runFiles = getXtcRunFiles(args.inputdir, args.run)
     stream2xtcFiles = indexStreams(runFiles)
-    moverParams = getMoverParams(args, stream2xtcFiles.keys())
+    moverParams = getMoverParams(args, list(stream2xtcFiles.keys()))
     if moverParams['mb_read_smalldata'] == 0.0:
         xtcFiles, smallFiles = getAllFiles(stream2xtcFiles)
         moverParams['mb_read_smalldata'] = computeDefaultSmallDataRead(moverParams['mb_read_xtc'], xtcFiles, smallFiles)
@@ -271,7 +272,7 @@ def dataMover(args):
                                                  moveParams, args.timeout, args.verbose, lock)
             streamFtype2chunkCurrentProcess[key] = (time.time(), moverProcess)
     
-    for key, startTimeProcess in streamFtype2chunkCurrentProcess.iteritems():
+    for key, startTimeProcess in streamFtype2chunkCurrentProcess.items():
         t0, process = startTimeProcess
         process.start()
 
@@ -279,7 +280,7 @@ def dataMover(args):
         moveAllChunks(streamFtype2chunkCurrentProcess, stream2xtcFiles, args, lock)
     except KeyboardInterrupt as kb:
         print("Killing current processes:")
-        for timeProcess in streamFtype2chunkCurrentProcess.itervalues():
+        for timeProcess in streamFtype2chunkCurrentProcess.values():
             t0, process = timeProcess
             process.terminate()
         raise kb

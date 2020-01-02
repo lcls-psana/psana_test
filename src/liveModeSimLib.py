@@ -1,4 +1,5 @@
 from __future__ import print_function
+from builtins import map
 import os
 import io
 import sys
@@ -128,8 +129,8 @@ def parseStreamDictOption(streams, optionString, typeArg):
     for streamOpt in optionString.split(','):
         stream,val = streamOpt.split(':')
         if stream.find('-')>=0:
-            a,b = map(int,stream.split('-'))
-            optStreams=range(a,b+1)
+            a,b = list(map(int,stream.split('-')))
+            optStreams=list(range(a,b+1))
         else:
             optStreams=[int(stream)]
         for stream in streams:
@@ -153,7 +154,7 @@ def simLiveMode(inprogress_ext, run, srcdir, destdir, start_delays, mb_per_write
         assert streamNo not in stream2xtc, "There are two xtcs with stream=%d for run=%d, they are %s and %s" % \
             (steamNo, run, xtc, stream2xtc[streamNo])
         stream2xtc[streamNo] = xtc
-    streams = stream2xtc.keys()
+    streams = list(stream2xtc.keys())
     stream2start_delay=parseStreamDictOption(streams, start_delays, float)
     stream2mb_per_write=parseStreamDictOption(streams, mb_per_writes, float)
     stream2max_mbs=parseStreamDictOption(streams, max_mbs, float)
@@ -165,7 +166,7 @@ def simLiveMode(inprogress_ext, run, srcdir, destdir, start_delays, mb_per_write
     # for each chunk 0 stream, start a process that copys it with throttle
     stream2process = {}
     lock = multiprocessing.Lock()
-    for stream, xtcFile in stream2xtc.iteritems():
+    for stream, xtcFile in stream2xtc.items():
         srcFile = xtcFile
         destFile = os.path.join(destdir, os.path.basename(srcFile))
         start_delay = stream2start_delay[stream]
@@ -179,7 +180,7 @@ def simLiveMode(inprogress_ext, run, srcdir, destdir, start_delays, mb_per_write
         stream2process[stream]=process
         process.start()
 
-    for stream, process in stream2process.iteritems():
+    for stream, process in stream2process.items():
         process.join()
         
     

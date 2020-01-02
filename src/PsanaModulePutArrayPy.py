@@ -25,8 +25,8 @@ class PsanaModulePutArrayPy(object):
         self.nonconst_key = self.configStr("nonconst_key",'')
         
     def event(self,evt,env):
-        nonconst_arr = np.ndarray.astype(np.array(range(12)),np.float32)        
-        const_arr = np.ndarray.astype(np.array(range(12)),np.float32)
+        nonconst_arr = np.ndarray.astype(np.array(list(range(12))),np.float32)        
+        const_arr = np.ndarray.astype(np.array(list(range(12))),np.float32)
         nonconst_arr.resize((3,4))
         const_arr.resize((3,4))
         const_arr.flags['WRITEABLE']=False

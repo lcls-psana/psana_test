@@ -1,3 +1,4 @@
+from builtins import map
 import ctypes
 import numpy as np
 import sys

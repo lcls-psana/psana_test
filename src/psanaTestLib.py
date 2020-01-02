@@ -6,6 +6,7 @@ from __future__ import print_function
 # to get the usage commands that are available.
 
 # Python packages
+from builtins import map
 import sys
 import glob
 import subprocess as sb
@@ -486,7 +487,7 @@ def lastDgramForTypes(xtc, dgrams=240, getUndamaged=True):
             if dbrNumElem not in earliestEpics:
                 earliestEpics[dbrNumElem]={'first_datagram':dg,'offset_next_datagram':None}
     for earlyDgDict in [earliestTypes, earliestEpics]:
-        for key,value in earlyDgDict.iteritems():
+        for key,value in earlyDgDict.items():
             dg = value['first_datagram']
             value['offset_next_datagram'] = dg2offset.get(dg+1,fileLen)
     return earliestTypes, earliestEpics
@@ -547,8 +548,8 @@ def previousDumpFile(deleteDump=True, doall=False):
     else:
         assert os.path.exists(prevFullName), "file %s does not exist, run with all=True" % prevFullName
         prevXtcDict, prevMultiDict = readPrevious()
-        prevXtc = prevXtcDict.keys()
-        prevMulti = prevMultiDict.keys()
+        prevXtc = list(prevXtcDict.keys())
+        prevMulti = list(prevMultiDict.keys())
         fout = open(prevFullName,'a')
     testTimes = {'xtc':{}, 'multi':{}}
     regressTests = readRegressionTestFile()
@@ -559,7 +560,7 @@ def previousDumpFile(deleteDump=True, doall=False):
     with outputDir('pstst') as outDir:
         dumpOutputDir = outDir.make_subdir('prev_xtc_dump')
         for src,srcDict in zip(['xtc','multi'],[testFiles, multiTests]):
-            for testNumber, info in srcDict.iteritems():
+            for testNumber, info in srcDict.items():
                 if (src == 'xtc') and (testNumber in prevXtc): continue
                 if (src == 'multi') and (testNumber in prevMulti): continue
                 t0 = time.time()
@@ -614,11 +615,11 @@ def previousDumpFile(deleteDump=True, doall=False):
                     if deleteDump: os.unlink(regressOutput)
                 if src == 'xtc':
                     fout.write("xtc_md5sum=%s   dump_md5sum=%s   regress_md5sum=%s   xtc=%s\n" % \
-                               (xtc_md5s.values()[0], dump_md5, regress_md5, info['basename']))
+                               (list(xtc_md5s.values())[0], dump_md5, regress_md5, info['basename']))
                 elif src == 'multi':
                     fout.write("xtc_md5sum=%s   dump_md5sum=%s   regress_md5sum=%s   multi=%s" % \
                                ('0' * 32, dump_md5, regress_md5, info['basedir']))
-                    xtcs = xtc_md5s.keys()
+                    xtcs = list(xtc_md5s.keys())
                     xtcs.sort()
                     for xtc in xtcs:
                         md5 = xtc_md5s[xtc]
@@ -715,7 +716,7 @@ def readPrevious():
             md5xtcs[xtc]=md5sum
             multiAndXtcs = ' '.join(nextFlds[0:-1])
             flds = multiAndXtcs.rsplit('_md5sum=',1)
-        xtcs = md5xtcs.keys()
+        xtcs = list(md5xtcs.keys())
         multi = multiAndXtcs.strip()
         assert multi.startswith('test_'), "multi name doesn't start with test_: %s" % multi
         number = int(multi.split('_')[1])
@@ -1023,7 +1024,7 @@ def testCommand(args):
         prev['xtc'], prev['multi'] = readPrevious()
         regress = readRegressionTestFile()
         whichTest = 'regress'
-        testNumberFilter = {'xtc':regress['xtc'].keys(), 'multi':regress['multi'].keys()}
+        testNumberFilter = {'xtc':list(regress['xtc'].keys()), 'multi':list(regress['multi'].keys())}
         expectedDiffs = getRegressionTestExpectedDifferences()
         srcs = ['xtc','multi']
         if testSet.startswith('xtc:'):
@@ -1047,9 +1048,9 @@ def testCommand(args):
             testNumberFilter['multi'] = []
             for val in commaSepTestSet:
                 if val.find('-')>0:
-                    a,b = map(int,val.split('-'))
+                    a,b = list(map(int,val.split('-')))
                     for src in srcs:
-                        testNumberFilter[src].extend(range(a,b+1))
+                        testNumberFilter[src].extend(list(range(a,b+1)))
                 else:
                     for src in srcs:
                         testNumberFilter[src].append(int(val))
@@ -1195,7 +1196,7 @@ def getValidTypeVerFromXtcLineDumpLine(origLn, xtcFileName=''):
     type_name = type_name.split(' plen=')[0]
     ln, version = ln.split(' ver=')
     ln, typeid = ln.split(' typeid=')
-    typeid, version = map(int, (typeid, version))
+    typeid, version = list(map(int, (typeid, version)))
     if typeid > numTypes: return None
     return (type_name, typeid, version)
 
@@ -1252,7 +1253,7 @@ def updateTestData(xtc, newTypeVers, dgrams):
         elif ln.startswith('xtc'):
             typeVersion = ln.split(' value=')[0].split(' typeid=')[1]
             payloadValid = ln.split(' payload=')[1].startswith('0x')
-            tp,ver = map(int,typeVersion.split(' ver='))
+            tp,ver = list(map(int,typeVersion.split(' ver=')))
             tpVer = (tp,ver)
             if tpVer in l1acceptFollowing and payloadValid:
                 if l1acceptFollowing[tpVer][0] == 'xtc_not_seen':
@@ -1446,9 +1447,9 @@ def updatePrevXtcDirs(previousXtcDirsFileName,  xtcDirsToScan):
     comments = '\n'.join([ln for ln in open(previousXtcDirsFileName).read().split('\n') if ln.strip().startswith('#')])
     previousXtcDirs = readPreviousXtcDirs(previousXtcDirsFileName)
     currentXtcDirs = previousXtcDirs
-    for scannedXtcDir, scanInfo in xtcDirsToScan.iteritems():
+    for scannedXtcDir, scanInfo in xtcDirsToScan.items():
         currentXtcDirs[scannedXtcDir] = scanInfo['mod_timestamp']
-    timeStampsXtcDirs = [(v,k) for k,v in currentXtcDirs.iteritems()]
+    timeStampsXtcDirs = [(v,k) for k,v in currentXtcDirs.items()]
     timeStampsXtcDirs.sort()
     # backup previous:
     n = 1
@@ -1551,7 +1552,7 @@ def typesCommand(args):
     print("** Currently: %d typeid/versions" % len(currentTypeVersions))
     print("** %d new xtc experiment directories to scan" % len(xtcDirsToScan))
     filesToScan = []
-    for xtcDir, xtcInfo in xtcDirsToScan.iteritems():
+    for xtcDir, xtcInfo in xtcDirsToScan.items():
         filesToScan.extend(xtcInfo['xtcs'])
     print("%d files to scan" % len(filesToScan))
     random.shuffle(filesToScan)
@@ -1573,13 +1574,13 @@ def makeRegressionTestFile(regressionTestFile = getRegressionTestFilename()):
     epicsDone = set()
     testFiles = getTestFiles(noTranslator=True)
     eventsForTest = dict([(num,0) for num in testFiles.keys()])
-    for num, basePath in testFiles.iteritems():
+    for num, basePath in testFiles.items():
         base, path = basePath['basename'],basePath['path']
         fileSize = os.stat(path).st_size
         earliestTypes, earliestEpics = lastDgramForTypes(path)
         for earlyDgDict, doneSet in zip([earliestTypes, earliestEpics],
                                         [typeVerDone, epicsDone]):
-            for typeId,dgDict in earlyDgDict.iteritems():
+            for typeId,dgDict in earlyDgDict.items():
                 if typeId not in doneSet:
                     dg = dgDict['first_datagram']
                     eventsForTest[num] = max(max(6,dg+1), eventsForTest[num])
@@ -1587,7 +1588,7 @@ def makeRegressionTestFile(regressionTestFile = getRegressionTestFilename()):
     if os.path.exists(regressionTestFile):
         sys.stderr.write("WARNING: overwriting: %s\n" % regressionTestFile)
     fout = open(regressionTestFile,'w')
-    testNumbers = testFiles.keys()
+    testNumbers = list(testFiles.keys())
     testNumbers.sort()
     for num in testNumbers:
         basePath = testFiles[num]['path']
@@ -1636,7 +1637,7 @@ def main(args):
         print(usage)
         sys.exit(0)
     cmd = args[1]
-    validCmds = cmdDict.keys()
+    validCmds = list(cmdDict.keys())
     if cmd not in validCmds:
         print("ERROR: cmd '%s' is not recognized" % cmd)
         print(usage)

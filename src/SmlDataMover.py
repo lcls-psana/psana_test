@@ -1,5 +1,6 @@
 from __future__ import print_function
 from __future__ import absolute_import
+from builtins import map
 import io
 import os
 import sys
@@ -50,8 +51,8 @@ def getSmlDataFiles(inputdir, run, verbose):
                                 glob.glob(os.path.join(inputdir, '*.xtc')))
     result = indexStreamChunk2fsize(smdFiles)
     if verbose:
-        for stream, chunk2fsize in result.iteritems():
-            for chunk, finfo in chunk2fsize.iteritems():
+        for stream, chunk2fsize in result.items():
+            for chunk, finfo in chunk2fsize.items():
                 print("stream=%2d chunk=%2d fsize=%.2fMB fname=%s" % \
                     (stream, chunk, finfo['size']/float(1<<20), finfo['fname']))
     return result
@@ -62,10 +63,10 @@ class MapFile(object):
         self.verbose = verbose
         self.lastEventNum, self.lastStreamPos = self.parseLine(self.mapfile.readline())
         assert self.lastEventNum == 0
-        for stream, streamPos in self.lastStreamPos.iteritems():
+        for stream, streamPos in self.lastStreamPos.items():
             streamPos['offset']=0
         if verbose:
-            print("mapfile initialized with streams: %s" % self.lastStreamPos.keys())
+            print("mapfile initialized with streams: %s" % list(self.lastStreamPos.keys()))
 
     def parseLine(self, ln):
         stream2pos = {}
@@ -76,7 +77,7 @@ class MapFile(object):
         while len(flds)>0:
             streamChunkEqual = flds.pop(0)
             streamChunk = streamChunkEqual.split('=')[0]
-            stream,chunk = map(int, streamChunk.split('.'))
+            stream,chunk = list(map(int, streamChunk.split('.')))
             offset = int(flds.pop(0))
             stream2pos[stream]={'chunk':chunk, 'offset':offset}
         return eventNum, stream2pos
@@ -97,7 +98,7 @@ class MapFile(object):
         return None
 
     def streams(self):
-        return self.lastStreamPos.keys()
+        return list(self.lastStreamPos.keys())
 
 class FileHandler(object):
     def __init__(self, outputdir, stream2chunk2finfo, verbose):
@@ -107,8 +108,8 @@ class FileHandler(object):
         self.verbose = verbose
 
     def clearOutputDirAndStartChunk0InProgressFiles(self):
-        for stream, chunk2finfo in self.stream2chunk2finfo.iteritems():
-            for chunk, finfo in chunk2finfo.iteritems():
+        for stream, chunk2finfo in self.stream2chunk2finfo.items():
+            for chunk, finfo in chunk2finfo.items():
                 fname = finfo['fname']
                 fsize = finfo['size']
                 basename = os.path.basename(fname)
@@ -213,7 +214,7 @@ def smallDataMover(inputdir, outputdir, run, numEventsToWrite, rate, mapfilename
 
     while (stream2nextPos is not None):
         t0 = time.time()
-        for stream, nextPos in stream2nextPos.iteritems():
+        for stream, nextPos in stream2nextPos.items():
             fileHandler.copyBlock(stream, stream2lastPos[stream], nextPos)
         if verbose:
             print("copied stream blocks to about event=%8d" % nextEvent)
