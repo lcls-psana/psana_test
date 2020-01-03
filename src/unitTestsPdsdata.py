@@ -80,7 +80,7 @@ class Pdsdata( unittest.TestCase ) :
 
     def test_smldata(self):
         def write2file(fname, txt):
-            f = file(fname,'w')
+            f = open(fname,'w')
             f.write(txt)
             f.close()
 

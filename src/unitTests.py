@@ -129,13 +129,13 @@ class Psana( unittest.TestCase ) :
         cmdLine += " %s" % inFile
         self.assertTrue(os.path.exists(inFile), "test data file: %s not found" % inFile)
         try:
-            fin = file(inFile,'r')
+            fin = open(inFile,'r')
         except:
             self.assertTrue(False,msg="test data exists, but this program cannot read it")
         fin.close()
         self.assertTrue(os.path.exists(os.path.split(outFile)[0]),msg="output directory does not exist")
         try:
-            fout = file(outFile,'w')
+            fout = open(outFile,'w')
         except:
             self.assertTrue(False,msg="program cannot write the file: %s check for permission issues" % outFile)
         fout.close()
@@ -695,7 +695,7 @@ class Psana( unittest.TestCase ) :
         os.system(offlineCmd)
 
         # make sure no errors (strip out warnings, we expect the warning: PSXtcInput.XtcInputModule smallDataProxy typeid found but smallDataProxy is null.
-        offlineStderr = file(offlineStderrFilename,'r').read().strip()
+        offlineStderr = open(offlineStderrFilename,'r').read().strip()
         offlineStderr = '\n'.join([ln for ln in offlineStderr.split('\n') if not ln.startswith('[warning')])
         self.assertEqual(offlineStderr,'',msg="There were errors in offline cmd=%s\nstderr=\n%s" % (offlineCmd, offlineStderr))
 
@@ -741,7 +741,7 @@ class Psana( unittest.TestCase ) :
             # we're done.
             # we expect warnings about finding the smallDataProxy typeid, but not having a small data proxy
             # object. Remove all warnings and Check for unexpected error output:
-            liveDumpStderr = file(dumpStdErrFile,'r').read().strip()
+            liveDumpStderr = open(dumpStdErrFile,'r').read().strip()
             liveDumpStderr  = '\n'.join([ln for ln in liveDumpStderr.split('\n') if not ln.startswith('[warning')])
             self.assertEqual(liveDumpStderr, '', msg="%s: There were errors in the live mode DumpDgram\ncmd=%s" % (testlabel, dumpCmd))
 
@@ -827,7 +827,7 @@ class Psana( unittest.TestCase ) :
             return destDir
 
         def readDgramHeaders(xtc, dgramOffsets):
-            f = file(xtc,'rb')
+            f = open(xtc,'rb')
             headers = []
             for dgramOffset in dgramOffsets:
                 f.seek(dgramOffset)
@@ -838,7 +838,7 @@ class Psana( unittest.TestCase ) :
         def writeDgramHeaders(xtc, dgramOffsets, newHeaders):
             oldSize = os.stat(xtc).st_size
             os.chmod(xtc, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IWGRP)
-            f = file(xtc,'r+b')
+            f = open(xtc,'r+b')
             for dgramOffset in dgramOffsets:
                 f.seek(dgramOffset)
                 f.write(newHeaders.pop(0))

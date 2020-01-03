@@ -49,7 +49,7 @@ class dump(object):
                 fullOutputFile = self.outputFile
             if os.path.exists(fullOutputFile):
                 print("warning: overwritting %s" % fullOutputFile)
-            self.fout = file(fullOutputFile,'w')
+            self.fout = open(fullOutputFile,'w')
         else:
             self.fout = sys.stdout
         if self.headerParam:

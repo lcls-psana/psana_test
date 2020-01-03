@@ -1,6 +1,7 @@
 import sys
 import os
 import shutil
+import six
 
 NOCLEAN = os.environ.get('NOCLEAN',False)
 if not NOCLEAN:
@@ -14,7 +15,12 @@ class TestOutputDir(object):
         
     def __enter__(self):
         global NOCLEAN
-        self.tmpdir = os.tempnam(None, self.prefix)
+        if six.PY3:
+            import tempfile
+            with tempfile.NamedTemporaryFile() as tf:
+                self.tmpdir = self.prefix + os.path.basename(tf.name)
+        else:
+            self.tmpdir = os.tempnam(None, self.prefix)
         self.rm = not NOCLEAN
         if not os.path.exists(self.tmpdir):
             os.makedirs(self.tmpdir)

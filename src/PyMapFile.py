@@ -7,7 +7,7 @@ class MapFile(object):
     for each event. Used for testing with psanaTestSmlDataMover
     '''
     def __init__(self, mapfilename):
-        self.mapfile = file(mapfilename,'w')
+        self.mapfile = open(mapfilename,'w')
         self.stream2pos = {}
         self._eventNumber = -1
 

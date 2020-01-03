@@ -59,7 +59,7 @@ def getSmlDataFiles(inputdir, run, verbose):
 
 class MapFile(object):
     def __init__(self, mapfilename, verbose):
-        self.mapfile = file(mapfilename, 'r')
+        self.mapfile = open(mapfilename, 'r')
         self.verbose = verbose
         self.lastEventNum, self.lastStreamPos = self.parseLine(self.mapfile.readline())
         assert self.lastEventNum == 0
