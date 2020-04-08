@@ -9,10 +9,10 @@ import numpy as np
 class dump(object):
     def __init__(self):
         self.epicsParam = self.configBool('epics', True)
-        self.aliasesParam  = self.configBool('aliases', True)
+        self.aliasesParam  = self.configBool('aliases', False)
         self.followEpicsAliases = self.configBool('dump_aliases',False)
         self.dumpSml = self.configBool('dump_sml',False)
-        self.epicsPrintForRegressionTests = self.configBool('regress_dump',False)
+        self.epicsPrintForRegressionTests = self.configBool('regress_dump',True)
         self.beginJobEvt = self.configBool('dump_beginjob_evt',True)
         # if outputFile is set, all output will be written to that file, if
         # not in parallel mode, otherwise, that file + '.subproc_n' where n
