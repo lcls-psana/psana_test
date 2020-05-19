@@ -53,7 +53,7 @@ Pds::Dgram * DgramHeaderIterator::next() {
 
 std::pair<Pds::Dgram *,size_t> DgramHeaderIterator::nextAndOffsetFromStart() {
   size_t offsetNext = _impl->posNextDgram();
-  return std::make_pair<Pds::Dgram *,size_t>(_impl->next(), offsetNext);
+  return std::pair<Pds::Dgram *,size_t>(_impl->next(), offsetNext);
 }
 
 
