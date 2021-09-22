@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-04
+2021-09-22 Daniel Damiani
+- update to pdsdata 9.3.1 for Alvium detector
+
 Tag: V00-08-56
 2016-12-16 David Schneider
 - update to pdsdata 8.7.0 for JungFrau detector

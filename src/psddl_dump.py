@@ -8135,6 +8135,146 @@ def Archon_ConfigV4_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def Vimba_AlviumConfigV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Vimba.AlviumConfigV1.TypeId
+    assert obj.Version == psana.Vimba.AlviumConfigV1.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'width: %s' % uint32_to_str( obj.width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'height: %s' % uint32_to_str( obj.height() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'offsetX: %s' % uint32_to_str( obj.offsetX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'offsetY: %s' % uint32_to_str( obj.offsetY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sensorWidth: %s' % uint32_to_str( obj.sensorWidth() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sensorHeight: %s' % uint32_to_str( obj.sensorHeight() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'contrastDarkLimit: %s' % uint32_to_str( obj.contrastDarkLimit() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'contrastBrightLimit: %s' % uint32_to_str( obj.contrastBrightLimit() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'contrastShape: %s' % uint32_to_str( obj.contrastShape() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureTime: %s' % double_to_str( obj.exposureTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'blackLevel: %s' % double_to_str( obj.blackLevel() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gain: %s' % double_to_str( obj.gain() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gamma: %s' % double_to_str( obj.gamma() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'manufacturer: %s' % str_to_str( obj.manufacturer() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'family: %s' % str_to_str( obj.family() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'model: %s' % str_to_str( obj.model() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'manufacturerId: %s' % str_to_str( obj.manufacturerId() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'version: %s' % str_to_str( obj.version() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'serialNumber: %s' % str_to_str( obj.serialNumber() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'firmwareId: %s' % str_to_str( obj.firmwareId() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'firmwareVersion: %s' % str_to_str( obj.firmwareVersion() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'depth: %s' % uint32_to_str( obj.depth() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameSize: %s' % uint32_to_str( obj.frameSize() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsX: %s' % uint32_to_str( obj.numPixelsX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsY: %s' % uint32_to_str( obj.numPixelsY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixels: %s' % uint32_to_str( obj.numPixels() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'reverseX:\n'
+    methodStr += enum_to_str(obj.reverseX(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'reverseY:\n'
+    methodStr += enum_to_str(obj.reverseY(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'contrastEnable:\n'
+    methodStr += enum_to_str(obj.contrastEnable(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'correctionEnable:\n'
+    methodStr += enum_to_str(obj.correctionEnable(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'roiEnable:\n'
+    methodStr += enum_to_str(obj.roiEnable(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'correctionType:\n'
+    methodStr += enum_to_str(obj.correctionType(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'correctionSet:\n'
+    methodStr += enum_to_str(obj.correctionSet(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pixelMode:\n'
+    methodStr += enum_to_str(obj.pixelMode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'triggerMode:\n'
+    methodStr += enum_to_str(obj.triggerMode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def Vimba_FrameV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Vimba.FrameV1.TypeId
+    assert obj.Version == psana.Vimba.FrameV1.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameid: %s' % uint64_to_str( obj.frameid() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timestamp: %s' % uint64_to_str( obj.timestamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data: %s' % ndarray_to_str( obj.data() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def Pixis_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Pixis.ConfigV1.TypeId
     assert obj.Version == psana.Pixis.ConfigV1.Version
@@ -11595,6 +11735,8 @@ objFunctionTable = {
     (psana.UsdUsb.FexDataV1.TypeId,1) : UsdUsb_FexDataV1_to_str,
     (psana.Uxi.ConfigV1.TypeId,1) : Uxi_ConfigV1_to_str,
     (psana.Uxi.FrameV1.TypeId,1) : Uxi_FrameV1_to_str,
+    (psana.Vimba.AlviumConfigV1.TypeId,1) : Vimba_AlviumConfigV1_to_str,
+    (psana.Vimba.FrameV1.TypeId,1) : Vimba_FrameV1_to_str,
     (psana.Zyla.ConfigV1.TypeId,1) : Zyla_ConfigV1_to_str,
     (psana.Zyla.FrameV1.TypeId,1) : Zyla_FrameV1_to_str,
     (psana.iStar.ConfigV1.TypeId,1) : iStar_ConfigV1_to_str,
