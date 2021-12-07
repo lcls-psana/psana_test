@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-05
+2021-12-07 Daniel Damiani
+- update to pdsdata 9.3.2 for TimeTool
+
 Tag: V01-00-04
 2021-09-22 Daniel Damiani
 - update to pdsdata 9.3.1 for Alvium detector
