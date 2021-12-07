@@ -8619,6 +8619,159 @@ def TimeTool_ConfigV2_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def TimeTool_ConfigV3_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.TimeTool.ConfigV3.TypeId
+    assert obj.Version == psana.TimeTool.ConfigV3.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'number_of_beam_event_codes: %s' % uint16_to_str( obj.number_of_beam_event_codes() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'number_of_laser_event_codes: %s' % uint16_to_str( obj.number_of_laser_event_codes() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'signal_cut: %s' % uint32_to_str( obj.signal_cut() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fit_max_iterations: %s' % uint32_to_str( obj.fit_max_iterations() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fit_weights_factor: %s' % double_to_str( obj.fit_weights_factor() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sb_convergence: %s' % double_to_str( obj.sb_convergence() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ref_convergence: %s' % double_to_str( obj.ref_convergence() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'weights: %s' % ndarray_to_str( obj.weights() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'calib_poly: %s' % ndarray_to_str( obj.calib_poly() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fit_params: %s' % ndarray_to_str( obj.fit_params() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'base_name: %s' % str_to_str( obj.base_name() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'use_full_roi: %s' % uint8_to_str( obj.use_full_roi() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'use_fit: %s' % uint8_to_str( obj.use_fit() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'write_image: %s' % uint8_to_str( obj.write_image() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'write_projections: %s' % uint8_to_str( obj.write_projections() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'subtract_sideband: %s' % uint8_to_str( obj.subtract_sideband() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'use_reference_roi: %s' % uint8_to_str( obj.use_reference_roi() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'number_of_weights: %s' % uint16_to_str( obj.number_of_weights() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'calib_poly_dim: %s' % uint8_to_str( obj.calib_poly_dim() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fit_params_dim: %s' % uint8_to_str( obj.fit_params_dim() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'base_name_length: %s' % uint8_to_str( obj.base_name_length() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'signal_projection_size: %s' % uint32_to_str( obj.signal_projection_size() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sideband_projection_size: %s' % uint32_to_str( obj.sideband_projection_size() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'reference_projection_size: %s' % uint32_to_str( obj.reference_projection_size() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'signal_x_size: %s' % uint32_to_str( obj.signal_x_size() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'signal_y_size: %s' % uint32_to_str( obj.signal_y_size() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'signal_size: %s' % uint32_to_str( obj.signal_size() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sideband_x_size: %s' % uint32_to_str( obj.sideband_x_size() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sideband_y_size: %s' % uint32_to_str( obj.sideband_y_size() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sideband_size: %s' % uint32_to_str( obj.sideband_size() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'reference_x_size: %s' % uint32_to_str( obj.reference_x_size() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'reference_y_size: %s' % uint32_to_str( obj.reference_y_size() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'reference_size: %s' % uint32_to_str( obj.reference_size() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sig_roi_lo:\n'
+    methodStr += Camera_FrameCoord_to_str(obj.sig_roi_lo(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sig_roi_hi:\n'
+    methodStr += Camera_FrameCoord_to_str(obj.sig_roi_hi(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sb_roi_lo:\n'
+    methodStr += Camera_FrameCoord_to_str(obj.sb_roi_lo(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sb_roi_hi:\n'
+    methodStr += Camera_FrameCoord_to_str(obj.sb_roi_hi(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ref_roi_lo:\n'
+    methodStr += Camera_FrameCoord_to_str(obj.ref_roi_lo(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ref_roi_hi:\n'
+    methodStr += Camera_FrameCoord_to_str(obj.ref_roi_hi(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'project_axis:\n'
+    methodStr += enum_to_str(obj.project_axis(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.beam_logic() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'beam_logic[%d]:\n' % idx
+        subMethodStr += TimeTool_EventLogic_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.laser_logic() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'laser_logic[%d]:\n' % idx
+        subMethodStr += TimeTool_EventLogic_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def TimeTool_DataV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.TimeTool.DataV1.TypeId
     assert obj.Version == psana.TimeTool.DataV1.Version
@@ -8687,6 +8840,55 @@ def TimeTool_DataV2_to_str(obj, indent, lvl, methodSep):
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'projected_reference: %s' % ndarray_to_str( obj.projected_reference() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'event_type:\n'
+    methodStr += enum_to_str(obj.event_type(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def TimeTool_DataV3_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.TimeTool.DataV3.TypeId
+    assert obj.Version == psana.TimeTool.DataV3.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'amplitude: %s' % double_to_str( obj.amplitude() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'position_pixel: %s' % double_to_str( obj.position_pixel() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'position_time: %s' % double_to_str( obj.position_time() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'position_fwhm: %s' % double_to_str( obj.position_fwhm() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ref_amplitude: %s' % double_to_str( obj.ref_amplitude() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'nxt_amplitude: %s' % double_to_str( obj.nxt_amplitude() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'projected_signal: %s' % ndarray_to_str( obj.projected_signal() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'projected_sideband: %s' % ndarray_to_str( obj.projected_sideband() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'projected_reference: %s' % ndarray_to_str( obj.projected_reference() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'full_signal: %s' % ndarray_to_str( obj.full_signal() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'full_sideband: %s' % ndarray_to_str( obj.full_sideband() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'full_reference: %s' % ndarray_to_str( obj.full_reference() )
     methodStrings.append(methodStr)                                 
     # multi_line_methods
     methodStr = doIndent(indent, lvl)
@@ -11722,8 +11924,10 @@ objFunctionTable = {
     (psana.Streak.ConfigV1.TypeId,1) : Streak_ConfigV1_to_str,
     (psana.TimeTool.ConfigV1.TypeId,1) : TimeTool_ConfigV1_to_str,
     (psana.TimeTool.ConfigV2.TypeId,2) : TimeTool_ConfigV2_to_str,
+    (psana.TimeTool.ConfigV3.TypeId,3) : TimeTool_ConfigV3_to_str,
     (psana.TimeTool.DataV1.TypeId,1) : TimeTool_DataV1_to_str,
     (psana.TimeTool.DataV2.TypeId,2) : TimeTool_DataV2_to_str,
+    (psana.TimeTool.DataV3.TypeId,3) : TimeTool_DataV3_to_str,
     (psana.Timepix.ConfigV1.TypeId,1) : Timepix_ConfigV1_to_str,
     (psana.Timepix.ConfigV2.TypeId,2) : Timepix_ConfigV2_to_str,
     (psana.Timepix.ConfigV3.TypeId,3) : Timepix_ConfigV3_to_str,
